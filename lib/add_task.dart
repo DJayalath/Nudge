@@ -24,6 +24,11 @@ class AddTaskState extends State<AddTask> {
     Navigator.pop(context);
   }
 
+  void deleteTask() {
+    this.widget.callback();
+    Navigator.pop(context);
+  }
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -63,12 +68,12 @@ class AddTaskState extends State<AddTask> {
                   ),
                 ),
 
-                // Checkbox to remind X minutes early
-                ListTile(
-                  leading: Icon(Icons.check_box_outline_blank),
-                  title: Text("Remind me 10 minutes early?"),
-                  onTap: null,
-                ),
+//                // Checkbox to remind X minutes early
+//                ListTile(
+//                  leading: Icon(Icons.check_box_outline_blank),
+//                  title: Text("Remind me 10 minutes early?"),
+//                  onTap: null,
+//                ),
 
                 // Optional body entry
                 Expanded(
@@ -91,19 +96,20 @@ class AddTaskState extends State<AddTask> {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: ButtonBar(
-                      alignment: MainAxisAlignment.spaceBetween,
+//                      alignment: MainAxisAlignment.spaceBetween,
+                    alignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        IconButton(
-                          alignment: Alignment.centerLeft,
-                          icon: Icon(Icons.alarm_add),
-                          onPressed: null,
-                        ),
+//                        IconButton(
+//                          alignment: Alignment.centerLeft,
+//                          icon: Icon(Icons.alarm_add),
+//                          onPressed: null,
+//                        ),
                         Row(
                           children: <Widget>[
                             IconButton(
                               alignment: Alignment.centerRight,
                               icon: Icon(Icons.delete),
-                              onPressed: null,
+                              onPressed: deleteTask,
                             ),
                             FlatButton(
                               child: const Text('SAVE'),

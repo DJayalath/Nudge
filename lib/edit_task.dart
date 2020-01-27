@@ -33,4 +33,10 @@ class EditTaskState extends AddTaskState {
     Navigator.pop(context);
   }
 
+  @override
+  void deleteTask() {
+    TaskListState.tasks.removeAt(index);
+    super.deleteTask();
+  }
+
 }
