@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:flutter_nudge_reminders/task.dart';
 import 'package:flutter_nudge_reminders/add_task.dart';
@@ -15,6 +16,56 @@ class TaskList extends StatefulWidget {
 class TaskListState extends State<TaskList> {
 
   static List<Task> tasks = [];
+
+  /*
+  Sort tasks such that:
+  - Timeless tasks at top
+  - Tasks coming up sooner above tasks coming up later
+   */
+  static int sortTasks(Task a, Task b)  {
+
+    if (!a.shouldRemind() && b.shouldRemind()) {
+      return -1;
+    }
+    else if (!b.shouldRemind() && a.shouldRemind()) {
+      return 1;
+    } else if (a.shouldRemind() && b.shouldRemind()) {
+
+      Duration dateADiff = DateTime.now().difference(a.getDate());
+      Duration dateBDiff = DateTime.now().difference(b.getDate());
+
+      switch (dateADiff.compareTo(dateBDiff)) {
+        case 1:
+          return -1;
+          break;
+        case -1:
+          return 1;
+          break;
+        // Handle deadlock between dates with time (expensive but rare)
+        case 0:
+          TimeOfDay nowTime = TimeOfDay.now();
+          double now = nowTime.hour.toDouble() + (nowTime.minute.toDouble() / 60);
+          double aTime = a.getTime().hour.toDouble() + (a.getTime().minute.toDouble() / 60);
+          double bTime = b.getTime().hour.toDouble() + (b.getTime().minute.toDouble() / 60);
+          double timeADiff = (aTime - now).abs();
+          double timeBDiff = (bTime - now).abs();
+          double diff = timeADiff - timeBDiff;
+          if (diff > 0) {
+            return -1;
+          } else if (diff < 0) {
+            return 1;
+          } else {
+            return 0;
+          }
+          break;
+      }
+
+    }
+
+    return 0;
+
+  }
+
   final _dateTimeStyle = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w300,
@@ -62,6 +113,7 @@ class TaskListState extends State<TaskList> {
   Widget _buildContent() {
 
     bool notNull(Object o) => o != null;
+    tasks.sort(sortTasks);
 
     return Container(
       margin: EdgeInsets.all(5.0),
