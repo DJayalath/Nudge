@@ -26,6 +26,10 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
 
   static List<Task> tasks = [];
+  final _dateTimeStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w300,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +111,10 @@ class _TaskListState extends State<TaskList> {
                 Scaffold
                     .of(context)
                     .showSnackBar(
-                      SnackBar(content: Text("Task dismissed"))
+                      SnackBar(
+                          content: Text("Task dismissed"),
+                          duration: Duration(seconds: 2),
+                      )
                 );
               },
 
@@ -119,8 +126,49 @@ class _TaskListState extends State<TaskList> {
 
                   child: Container(
   //                decoration: ,
-                    child: ListTile(
-                      title: Text(tasks[i]._title),
+                    margin: EdgeInsets.symmetric(vertical: 10.0),
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          title: Text(
+                            tasks[i]._title,
+                            style: tasks[i]._complete ? TextStyle(decoration: TextDecoration.lineThrough) : null,
+                          ),
+                          subtitle: (tasks[i]._body != "") ? Text(tasks[i]._body) : null,
+                          leading: IconButton(
+                            icon: Icon(tasks[i]._complete ? Icons.check_box : Icons.check_box_outline_blank),
+                            onPressed: () {
+                              setState(() {
+                                tasks[i]._complete = !tasks[i]._complete;
+                              });
+                            },
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.alarm_add),
+                            onPressed: () {
+
+                              showDialog(
+                                context: context,
+                                builder: (_) {
+                                  return AlertDialog(i);
+                                }
+                              );
+                            },
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: Icon(Icons.alarm_on),
+                          title: Text(
+                            tasks[i]._selectedTime.format(context),
+                            style: _dateTimeStyle,
+                          ),
+                          trailing: Text(
+                            tasks[i]._selectedDate.toString().split(' ')[0],
+                            style: _dateTimeStyle,
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -138,10 +186,69 @@ class _TaskListState extends State<TaskList> {
 
 }
 
+class AlertDialog extends StatefulWidget {
+
+  final i;
+  AlertDialog(this.i);
+
+  @override
+  _AlertDialogState createState() => new _AlertDialogState();
+}
+
+class _AlertDialogState extends State<AlertDialog> {
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text('Select date/time'),
+      children: <Widget>[
+        SimpleDialogOption(
+          onPressed: () => _selectDate(context, this.widget.i),
+          child: Text("${_TaskListState.tasks[this.widget.i]._selectedDate.toLocal()}".split(' ')[0]),
+        ),
+        SimpleDialogOption(
+          onPressed: () => _selectTime(context, this.widget.i),
+          child: Text("${_TaskListState.tasks[this.widget.i]._selectedTime.format(context)}"),
+        ),
+      ],
+    );
+  }
+
+  Future<Null> _selectDate(BuildContext context, index) async {
+    Task task = _TaskListState.tasks[index];
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: task._selectedDate != DateTime(2015, 8) ? task._selectedDate : DateTime.now(),
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _TaskListState.tasks[index]._selectedDate)
+      setState(() {
+        _TaskListState.tasks[index]._selectedDate = picked;
+      });
+  }
+
+  Future<Null> _selectTime(BuildContext context, index) async {
+    Task task = _TaskListState.tasks[index];
+    final TimeOfDay picked = await showTimePicker(
+        context: context,
+        initialTime: task._selectedTime != TimeOfDay(hour: 0, minute: 0) ? task._selectedTime : TimeOfDay.now(),
+    );
+    if (picked != null && picked != task._selectedTime)
+      setState(() {
+        task._selectedTime = picked;
+      });
+  }
+
+}
+
 class Task {
 
   final _title;
   final _body;
+  var _complete = false;
+  var _selectedDate = DateTime(2015, 8);
+  var _selectedTime = TimeOfDay(hour: 0, minute: 0);
 
   Task(this._title, this._body);
 }
@@ -267,7 +374,7 @@ class _AddTaskState extends State<AddTask> {
                     children: <Widget>[
                       IconButton(
                         alignment: Alignment.centerLeft,
-                        icon: Icon(Icons.add_alert),
+                        icon: Icon(Icons.alarm_add),
                         onPressed: null,
                       ),
                       Row(
