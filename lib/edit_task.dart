@@ -25,6 +25,8 @@ class EditTaskState extends AddTaskState {
 
   @override
   void saveTask(task) {
+    task.selectedDate = this.task.selectedDate;
+    task.selectedTime = this.task.selectedTime;
     TaskListState.tasks[index] = task;
     this.widget.callback();
     Navigator.pop(context);
