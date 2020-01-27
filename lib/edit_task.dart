@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_nudge_reminders/add_task.dart';
 import 'package:flutter_nudge_reminders/task_list.dart';
+import 'package:flutter_nudge_reminders/task.dart';
 
 class EditTask extends AddTask {
 
-  final _task;
+  final Task _task;
   final _index;
   EditTask(callback, this._task, this._index) : super(callback);
 
@@ -16,17 +17,17 @@ class EditTask extends AddTask {
 class EditTaskState extends AddTaskState {
 
   final index;
-  final task;
+  final Task task;
 
   EditTaskState(this.task, this.index) {
-    titleController = TextEditingController(text: task.title);
-    bodyController = TextEditingController(text: task.body);
+    titleController = TextEditingController(text: task.getTitle());
+    bodyController = TextEditingController(text: task.getBody());
   }
 
   @override
   void saveTask(task) {
-    task.selectedDate = this.task.selectedDate;
-    task.selectedTime = this.task.selectedTime;
+    if (this.task.shouldRemind())
+      task.setDateTime(this.task.getDate(), this.task.getTime());
     TaskListState.tasks[index] = task;
     this.widget.callback();
     Navigator.pop(context);

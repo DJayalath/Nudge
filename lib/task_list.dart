@@ -61,6 +61,8 @@ class TaskListState extends State<TaskList> {
 
   Widget _buildContent() {
 
+    bool notNull(Object o) => o != null;
+
     return Container(
       margin: EdgeInsets.all(5.0),
       child: ListView.builder(
@@ -71,7 +73,7 @@ class TaskListState extends State<TaskList> {
           itemBuilder: (context, i) {
             return Dismissible(
 
-              key: Key(tasks[i].title),
+              key: Key(tasks[i].getTitle()),
 
               background: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
@@ -120,44 +122,45 @@ class TaskListState extends State<TaskList> {
                       children: <Widget>[
                         ListTile(
                           title: Text(
-                            tasks[i].title,
-                            style: tasks[i].complete ? TextStyle(decoration: TextDecoration.lineThrough) : null,
+                            tasks[i].getTitle(),
+                            style: tasks[i].isComplete() ? TextStyle(decoration: TextDecoration.lineThrough) : null,
                           ),
-                          subtitle: (tasks[i].body != "") ? Text(tasks[i].body) : null,
+                          subtitle: tasks[i].isBodySet() ? Text(tasks[i].getBody()) : null,
                           leading: IconButton(
-                            icon: Icon(tasks[i].complete ? Icons.check_box : Icons.check_box_outline_blank),
+                            icon: Icon(tasks[i].isComplete() ? Icons.check_box : Icons.check_box_outline_blank),
                             onPressed: () {
                               setState(() {
-                                tasks[i].complete = !tasks[i].complete;
+                                tasks[i].toggleComplete();
                               });
                             },
                           ),
                           trailing: IconButton(
-                            icon: Icon(Icons.alarm_add),
+                            icon: Icon(tasks[i].shouldRemind() ? Icons.alarm_on : Icons.alarm_add),
                             onPressed: () {
 
                               showDialog(
                                   context: context,
                                   builder: (_) {
-                                    return DateTimeDialog(i, this.callback);
+                                    return DateTimeDialog(tasks[i], this.callback);
                                   }
                               );
                             },
                           ),
                         ),
-                        Divider(),
-                        ListTile(
-                          leading: Icon(Icons.alarm_on),
-                          title: Text(
-                            tasks[i].selectedTime.format(context),
-                            style: _dateTimeStyle,
+                        if (tasks[i].shouldRemind())
+                          Divider(),
+                        if (tasks[i].shouldRemind())
+                          ListTile(
+                            title: Text(
+                              tasks[i].getTime().format(context),
+                              style: _dateTimeStyle,
+                            ),
+                            trailing: Text(
+                              tasks[i].getDate().toString().split(' ')[0],
+                              style: _dateTimeStyle,
+                            ),
                           ),
-                          trailing: Text(
-                            tasks[i].selectedDate.toString().split(' ')[0],
-                            style: _dateTimeStyle,
-                          ),
-                        )
-                      ],
+                      ].where(notNull).toList(),
                     ),
                   ),
                 ),
