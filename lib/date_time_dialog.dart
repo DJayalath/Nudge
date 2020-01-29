@@ -20,9 +20,9 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   @override
   void initState() {
 
-    if (this.widget.task.shouldRemind()) {
-      date = this.widget.task.getDate();
-      time = this.widget.task.getTime();
+    if (this.widget.task.isReminderSet) {
+      date = this.widget.task.date;
+      time = this.widget.task.time;
     }
 
     super.initState();
@@ -65,11 +65,11 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: this.widget.task.shouldRemind() ? this.widget.task.getDate() : DateTime.now(),
+      initialDate: this.widget.task.isReminderSet ? this.widget.task.date : DateTime.now(),
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != this.widget.task.getDate())
+    if (picked != null && picked != this.widget.task.date)
       setState(() {
         date = picked;
       });
@@ -78,9 +78,9 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   Future<Null> _selectTime(BuildContext context) async {
     final TimeOfDay picked = await showTimePicker(
       context: context,
-      initialTime: this.widget.task.shouldRemind() ? this.widget.task.getTime() : TimeOfDay.now(),
+      initialTime: this.widget.task.isReminderSet ? this.widget.task.time : TimeOfDay.now(),
     );
-    if (picked != null && picked != this.widget.task.getTime())
+    if (picked != null && picked != this.widget.task.time)
       setState(() {
         time = picked;
       });

@@ -1,57 +1,56 @@
 import 'package:flutter/material.dart';
 
+/// A generic task.
 class Task {
-
+  /// The task title.
   final _title;
+
+  /// Additional information about the task.
   final _body;
+
+  /// The date the task should be completed by.
   var _selectedDate;
+
+  /// The time the task should be completed by.
   var _selectedTime;
-  var _complete = false;
-  var _remind = false;
+
+  /// The task completion status.
+  var _isComplete = false;
+
+  /// Whether the task has a reminder set.
+  var _shouldRemind = false;
 
   Task(this._title, this._body);
 
-  String getTitle() {
-    return _title;
-  }
+  String get body => _body;
 
-  String getBody() {
-    return _body;
-  }
+  DateTime get date => _selectedDate;
 
-  bool isBodySet() {
-    return _body != "";
-  }
+  bool get isComplete => _isComplete;
 
+  bool get isReminderSet => _shouldRemind;
+
+  TimeOfDay get time => _selectedTime;
+
+  String get title => _title;
+
+  /// Checks if body has a non-empty string value.
+  bool isBodySet() => _body != "";
+
+  /// Removes the task reminder.
   void resetDateTime() {
-    _remind = false;
+    _shouldRemind = false;
     _selectedDate = null;
     _selectedTime = null;
   }
 
+  /// Sets a reminder for the task with a [date] and [time] for completion.
   void setDateTime(date, time) {
-    _remind = true;
+    _shouldRemind = true;
     _selectedDate = date;
     _selectedTime = time;
   }
 
-  DateTime getDate() {
-    return _selectedDate;
-  }
-
-  TimeOfDay getTime() {
-    return _selectedTime;
-  }
-
-  bool shouldRemind() {
-    return _remind;
-  }
-
-  bool isComplete() {
-    return _complete;
-  }
-
-  void toggleComplete() {
-    _complete = !_complete;
-  }
+  /// Toggles the completion status of the task.
+  void toggleComplete() => _isComplete = !_isComplete;
 }

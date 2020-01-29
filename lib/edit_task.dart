@@ -21,14 +21,14 @@ class EditTaskState extends AddTaskState {
   final Task task;
 
   EditTaskState(this.task, this.index) {
-    titleController = TextEditingController(text: task.getTitle());
-    bodyController = TextEditingController(text: task.getBody());
+    titleController = TextEditingController(text: task.title);
+    bodyController = TextEditingController(text: task.body);
   }
 
   @override
   void saveTask(task) {
-    if (this.task.shouldRemind())
-      task.setDateTime(this.task.getDate(), this.task.getTime());
+    if (this.task.isReminderSet)
+      task.setDateTime(this.task.date, this.task.time);
     TaskListState.tasks[index] = task;
     TaskIO.writeTasks(TaskListState.tasks);
     this.widget.callback();
