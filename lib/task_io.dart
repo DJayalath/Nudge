@@ -20,7 +20,7 @@ class TaskIO {
 
   /// Reads tasks from disk.
   static Future<List<Task>> readTasks() async {
-    final tasks = [];
+    final List<Task> tasks = [];
 
     try {
       // Get the file to read.

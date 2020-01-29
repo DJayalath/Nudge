@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_nudge_reminders/add_task.dart';
 import 'package:flutter_nudge_reminders/date_time_dialog.dart';
-import 'package:flutter_nudge_reminders/edit_task.dart';
 import 'package:flutter_nudge_reminders/task.dart';
 import 'package:flutter_nudge_reminders/task_io.dart';
 
@@ -61,7 +60,7 @@ class TaskListState extends State<TaskList> {
   /// Builds the list of tasks to show.
   Widget _buildContent() {
     /// Checks if an object exists.
-    bool notNull(Object o) => o ?? false;
+    bool notNull(Object o) => o != null;
 
     // Sort the tasks before building the task list widget.
     tasks.sort(sortTasks);
@@ -182,12 +181,11 @@ class TaskListState extends State<TaskList> {
     );
   }
 
-  /// Pushes the route [EditTask] that allows tasks to be edited.
+  /// Pushes the route [AddTask.edit] that allows tasks to be edited.
   void _editTaskRoute(task, index) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => EditTask(this.callback, task, index)),
+      MaterialPageRoute(builder: (context) => AddTask.edit(this.callback, task, index)),
     );
   }
 
