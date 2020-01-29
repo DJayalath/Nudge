@@ -9,6 +9,10 @@ class AddTask extends StatefulWidget {
   final callback;
   AddTask(this.callback);
 
+  Task task;
+  int index;
+  AddTask.edit(this.callback, this.task, this.index);
+
   @override
   AddTaskState createState() => AddTaskState();
 
@@ -16,18 +20,47 @@ class AddTask extends StatefulWidget {
 
 class AddTaskState extends State<AddTask> {
 
-  var titleController = TextEditingController();
-  var bodyController = TextEditingController();
+  TextEditingController titleController;
+  TextEditingController bodyController;
+
+  bool isEditMode() => widget.task ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (isEditMode()) {
+      titleController = TextEditingController(text: widget.task.title);
+      bodyController = TextEditingController(text: widget.task.body);
+    } else {
+      titleController = TextEditingController();
+      bodyController = TextEditingController();
+    }
+
+  }
 
   void saveTask(task) {
-    TaskListState.tasks.add(task);
+
+    if (isEditMode()) {
+      if (widget.task.isReminderSet) task.setDateTime(widget.task.date, widget.task.time);
+      TaskListState.tasks[widget.index] = task;
+    } else {
+      TaskListState.tasks.add(task);
+    }
+
     TaskIO.writeTasks(TaskListState.tasks);
-    this.widget.callback();
+    widget.callback();
     Navigator.pop(context);
   }
 
   void deleteTask() {
-    this.widget.callback();
+
+    if (isEditMode()) {
+      TaskListState.tasks.removeAt(widget.index);
+      TaskIO.writeTasks(TaskListState.tasks);
+    }
+
+    widget.callback();
     Navigator.pop(context);
   }
 
