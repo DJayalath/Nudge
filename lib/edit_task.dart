@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_nudge_reminders/add_task.dart';
 import 'package:flutter_nudge_reminders/task_list.dart';
 import 'package:flutter_nudge_reminders/task.dart';
+import 'package:flutter_nudge_reminders/task_io.dart';
 
 class EditTask extends AddTask {
 
@@ -29,6 +30,7 @@ class EditTaskState extends AddTaskState {
     if (this.task.shouldRemind())
       task.setDateTime(this.task.getDate(), this.task.getTime());
     TaskListState.tasks[index] = task;
+    TaskIO.writeTasks(TaskListState.tasks);
     this.widget.callback();
     Navigator.pop(context);
   }
@@ -36,6 +38,7 @@ class EditTaskState extends AddTaskState {
   @override
   void deleteTask() {
     TaskListState.tasks.removeAt(index);
+    TaskIO.writeTasks(TaskListState.tasks);
     super.deleteTask();
   }
 

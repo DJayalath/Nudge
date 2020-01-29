@@ -21,7 +21,7 @@ class TaskIO {
     return file.readAsLines();
   }
 
-  static Future<File> writeTasks(List<Task> tasks) async {
+  static void writeTasks(List<Task> tasks) async {
 
     final file = await _localFile;
 //    file.delete();
@@ -41,9 +41,11 @@ class TaskIO {
     }
 
     // Write the file.
-    return file.writeAsString(tasksString, mode: FileMode.writeOnly);
+    await file.writeAsString(tasksString, mode: FileMode.writeOnly);
+    debugPrint("Wrote files");
   }
 
+  // TODO: Check file exists, moron!
   static Future<List<Task>> readTasks() async {
 
     List<Task> tasks = [];
@@ -55,15 +57,15 @@ class TaskIO {
       List<String> contents = await _readLines(file);
       for (String line in contents) {
 
-        debugPrint(line);
-        
+        debugPrint("Read: " + line);
+
         List<String> parts = line.split(',');
         Task task = Task(parts[0], parts[1]);
-        
+
         if (parts[5] == "T") {
           task.setDateTime(
-              DateTime.fromMillisecondsSinceEpoch(int.parse(parts[2])),
-              TimeOfDay(hour: int.parse(parts[3]), minute: int.parse(parts[4])),
+            DateTime.fromMillisecondsSinceEpoch(int.parse(parts[2])),
+            TimeOfDay(hour: int.parse(parts[3]), minute: int.parse(parts[4])),
           );
         }
 
@@ -75,6 +77,7 @@ class TaskIO {
 
       return tasks;
     } catch (e) {
+      debugPrint("Failed to read file");
       // TODO: If encountering an error, do something.
       return tasks;
     }

@@ -21,12 +21,10 @@ class TaskListState extends State<TaskList> {
   @override
   void initState() {
     super.initState();
-    _readTasks();
-  }
-
-  void _readTasks() async {
-    tasks = await TaskIO.readTasks();
-    setState(() {
+    TaskIO.readTasks().then((List<Task> taskList) {
+      setState(() {
+        tasks = taskList;
+      });
     });
   }
 
@@ -123,14 +121,7 @@ class TaskListState extends State<TaskList> {
     );
   }
 
-  void debugRead() async {
-    tasks = await TaskIO.readTasks();
-  }
-
   Widget _buildContent() {
-
-    debugRead();
-    TaskIO.writeTasks(tasks);
 
     bool notNull(Object o) => o != null;
     tasks.sort(sortTasks);

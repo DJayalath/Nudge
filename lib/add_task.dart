@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_nudge_reminders/task_list.dart';
 import 'package:flutter_nudge_reminders/task.dart';
+import 'package:flutter_nudge_reminders/task_io.dart';
 
 class AddTask extends StatefulWidget {
 
@@ -20,6 +21,7 @@ class AddTaskState extends State<AddTask> {
 
   void saveTask(task) {
     TaskListState.tasks.add(task);
+    TaskIO.writeTasks(TaskListState.tasks);
     this.widget.callback();
     Navigator.pop(context);
   }
