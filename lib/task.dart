@@ -4,9 +4,9 @@ class Task {
 
   final _title;
   final _body;
-  var _complete = false;
   var _selectedDate;
   var _selectedTime;
+  var _complete = false;
   var _remind = false;
 
   Task(this._title, this._body);

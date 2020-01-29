@@ -5,6 +5,7 @@ import 'package:flutter_nudge_reminders/task.dart';
 import 'package:flutter_nudge_reminders/add_task.dart';
 import 'package:flutter_nudge_reminders/edit_task.dart';
 import 'package:flutter_nudge_reminders/date_time_dialog.dart';
+import 'package:flutter_nudge_reminders/task_io.dart';
 
 class TaskList extends StatefulWidget {
 
@@ -16,6 +17,18 @@ class TaskList extends StatefulWidget {
 class TaskListState extends State<TaskList> {
 
   static List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _readTasks();
+  }
+
+  void _readTasks() async {
+    tasks = await TaskIO.readTasks();
+    setState(() {
+    });
+  }
 
   /*
   Sort tasks such that:
@@ -110,7 +123,14 @@ class TaskListState extends State<TaskList> {
     );
   }
 
+  void debugRead() async {
+    tasks = await TaskIO.readTasks();
+  }
+
   Widget _buildContent() {
+
+    debugRead();
+    TaskIO.writeTasks(tasks);
 
     bool notNull(Object o) => o != null;
     tasks.sort(sortTasks);
