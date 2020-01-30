@@ -135,7 +135,7 @@ class AddTaskState extends State<AddTask> {
   }
 
   /// Checks if a task is being edited rather than added.
-  bool isEditMode() => widget.task ?? false;
+  bool isEditMode() => widget.task != null;
 
   /// Saves the task to [TaskListState.tasks] and writes to disk.
   void saveTask(task) {
