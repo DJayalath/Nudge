@@ -71,8 +71,8 @@ class Task {
     } else if (a.isReminderSet && b.isReminderSet) {
       // Both [a] and [b] have reminders. Sort deadlock by which is soonest.
       // Calculate difference between time now and set date.
-      Duration dateADiff = DateTime.now().difference(a.date);
-      Duration dateBDiff = DateTime.now().difference(b.date);
+      final dateADiff = DateTime.now().difference(a.date);
+      final dateBDiff = DateTime.now().difference(b.date);
 
       // Use the difference to decide which task is soonest.
       switch (dateADiff.compareTo(dateBDiff)) {
@@ -87,27 +87,27 @@ class Task {
         case 0:
           // [a] and [b] both are on the same date. Sort deadlock by soonest time.
           // TODO: Make this more efficient.
-          TimeOfDay timeNow = TimeOfDay.now();
+          final timeNow = TimeOfDay.now();
 
           // Calculate times in hours.
-          double now =
+          final timeNowInHours =
               timeNow.hour.toDouble() + (timeNow.minute.toDouble() / 60);
-          double timeOfAInHours =
+          final timeOfAInHours =
               a.time.hour.toDouble() + (a.time.minute.toDouble() / 60);
-          double timeOfBInHours =
+          final timeOfBInHours =
               b.time.hour.toDouble() + (b.time.minute.toDouble() / 60);
 
           // Calculate time difference between now and the task times.
-          double timeUntilA = (timeOfAInHours - now).abs();
-          double timeUntilB = (timeOfBInHours - now).abs();
+          final timeUntilA = (timeOfAInHours - timeNowInHours).abs();
+          final timeUntilB = (timeOfBInHours - timeNowInHours).abs();
 
           // Calculate the difference between the tasks' upcoming times.
-          double diff = timeUntilA - timeUntilB;
+          final difference = timeUntilA - timeUntilB;
 
           // Put the soonest task on top
-          if (diff > 0) {
+          if (difference > 0) {
             return -1;
-          } else if (diff < 0) {
+          } else if (difference < 0) {
             return 1;
           } else {
             // If both tasks at exact same time, make no distinction.

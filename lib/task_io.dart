@@ -27,15 +27,15 @@ class TaskIO {
       final file = await _localFile;
 
       // Read each line of the file.
-      List<String> contents = await file.readAsLines();
+      final contents = await file.readAsLines();
 
       for (String line in contents) {
 
         // Split by commas (file is formatted as lines of comma-separated variables).
-        List<String> parts = line.split(',');
+        final parts = line.split(',');
 
         // Create a new task instance with the title, [parts[0]], and body [[parts[1]].
-        Task task = Task(parts[0], parts[1]);
+        final task = Task(parts[0], parts[1]);
 
         // Check if a reminder, [[parts[5]] is set.
         if (parts[5] == "T") {
@@ -67,12 +67,12 @@ class TaskIO {
     // Get the file to write.
     final file = await _localFile;
 
-    String tasksString = "";
+    var tasksStringFormatted = "";
 
     for (Task task in tasks) {
 
       // Build string from member variables of [Task] object.
-      tasksString += "${task.title},"
+      tasksStringFormatted += "${task.title},"
           "${task.body},"
           "${task.isReminderSet ? task.date.millisecondsSinceEpoch : "F"},"
           "${task.isReminderSet ? task.time.hour : "F"},"
@@ -84,6 +84,6 @@ class TaskIO {
     }
 
     // Write the string to the file on disk (ensuring overwrite).
-    await file.writeAsString(tasksString, mode: FileMode.writeOnly);
+    await file.writeAsString(tasksStringFormatted, mode: FileMode.writeOnly);
   }
 }
