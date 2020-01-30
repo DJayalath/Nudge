@@ -20,43 +20,89 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   /// The time of the task.
   var time = TimeOfDay.now();
 
+  /// A style for selector boxes.
+  final _selectorDecoration = BoxDecoration(
+    color: Colors.grey[300],
+    borderRadius: BorderRadius.all(Radius.circular(3.0)),
+  );
+
+  /// A style for selector text.
+  final _selectorStyle = TextStyle(
+    fontSize: 15.0,
+    fontWeight: FontWeight.w400,
+  );
+
   /// Builds the dialog as a simple selection menu.
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: const Text('Select date/time'),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(3.0))
+      ),
       children: <Widget>[
-        // The date picker.
-        SimpleDialogOption(
-          onPressed: () => _selectDate(context),
-          child: Text("${date.toLocal()}".split(' ')[0]),
+        ListTile(
+          leading: Icon(Icons.calendar_today),
+          onTap: () => _selectDate(context),
+          title: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: _selectorDecoration,
+            child: Text(
+              "${date.toLocal()}".split(' ')[0],
+              style: _selectorStyle,
+            ),
+          ),
         ),
 
-        // The time picker.
-        SimpleDialogOption(
-          onPressed: () => _selectTime(context),
-          child: Text("${time.format(context)}"),
+        ListTile(
+          leading: Icon(Icons.access_time),
+          onTap: () => _selectTime(context),
+          title: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: _selectorDecoration,
+            child: Text(
+              "${time.format(context)}",
+              style: _selectorStyle,
+            ),
+          ),
         ),
 
+        ButtonBar(
+          alignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                widget.task.resetDateTime();
+                widget.callback();
+                Navigator.pop(context);
+              },
+            ),
+
+            Row(
+                children: <Widget>[
+
+                  FlatButton(
+                    child: const Text('CANCEL'),
+                    onPressed: () {
+                      widget.callback();
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  FlatButton(
+                    child: const Text('SAVE'),
+                    onPressed: () {
+                      widget.task.setDateTime(date, time);
+                      widget.callback();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+            ),
+          ],
+        ),
         // Delete reminder button.
-        FlatButton(
-          child: const Text('DELETE'),
-          onPressed: () {
-            widget.task.resetDateTime();
-            widget.callback();
-            Navigator.pop(context);
-          },
-        ),
-
-        // Save reminder button.
-        FlatButton(
-          child: const Text('SAVE'),
-          onPressed: () {
-            widget.task.setDateTime(date, time);
-            widget.callback();
-            Navigator.pop(context);
-          },
-        )
       ],
     );
   }
