@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_nudge_reminders/task_list.dart';
+import 'task_list.dart';
 
 /// Runs the app.
 void main() {

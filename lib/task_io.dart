@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_nudge_reminders/task.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'task.dart';
 
 /// A helper for reading/writing tasks to disk.
 class TaskIO {

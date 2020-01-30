@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nudge_reminders/task.dart';
+
+import 'task.dart';
 
 /// A dialog to set date and time of a task.
 class DateTimeDialog extends StatefulWidget {

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nudge_reminders/add_task.dart';
-import 'package:flutter_nudge_reminders/date_time_dialog.dart';
-import 'package:flutter_nudge_reminders/task.dart';
-import 'package:flutter_nudge_reminders/task_io.dart';
+
+import 'add_task.dart';
+import 'date_time_dialog.dart';
+import 'task.dart';
+import 'task_io.dart';
 
 /// The list of tasks displayed in the home page of the app.
 class TaskList extends StatefulWidget {

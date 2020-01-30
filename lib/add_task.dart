@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nudge_reminders/task.dart';
-import 'package:flutter_nudge_reminders/task_io.dart';
-import 'package:flutter_nudge_reminders/task_list.dart';
+
+import 'task.dart';
+import 'task_io.dart';
+import 'task_list.dart';
 
 /// A route for the user to enter and add tasks.
 class AddTask extends StatefulWidget {
