@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_nudge_reminders/task.dart';
 
+/// A dialog to set date and time of a task.
 class DateTimeDialog extends StatefulWidget {
-
   final callback;
   final Task task;
   DateTimeDialog(this.task, this.callback);
@@ -12,78 +11,101 @@ class DateTimeDialog extends StatefulWidget {
   DateTimeDialogState createState() => new DateTimeDialogState();
 }
 
+/// A state to control displaying the dialog.
 class DateTimeDialogState extends State<DateTimeDialog> {
-
+  /// The date of the task.
   var date = DateTime.now();
+
+  /// The time of the task.
   var time = TimeOfDay.now();
 
-  @override
-  void initState() {
-
-    if (this.widget.task.isReminderSet) {
-      date = this.widget.task.date;
-      time = this.widget.task.time;
-    }
-
-    super.initState();
-  }
-
+  /// Builds the dialog as a simple selection menu.
   @override
   Widget build(BuildContext context) {
-    
     return SimpleDialog(
       title: const Text('Select date/time'),
       children: <Widget>[
+        // The date picker.
         SimpleDialogOption(
           onPressed: () => _selectDate(context),
           child: Text("${date.toLocal()}".split(' ')[0]),
         ),
+
+        // The time picker.
         SimpleDialogOption(
           onPressed: () => _selectTime(context),
           child: Text("${time.format(context)}"),
         ),
+
+        // Delete reminder button.
         FlatButton(
           child: const Text('DELETE'),
           onPressed: () {
-            this.widget.task.resetDateTime();
-            this.widget.callback();
+            widget.task.resetDateTime();
+            widget.callback();
             Navigator.pop(context);
           },
         ),
+
+        // Save reminder button.
         FlatButton(
           child: const Text('SAVE'),
           onPressed: () {
-            this.widget.task.setDateTime(date, time);
-            this.widget.callback();
+            widget.task.setDateTime(date, time);
+            widget.callback();
             Navigator.pop(context);
-            },
+          },
         )
       ],
     );
   }
 
-  Future<Null> _selectDate(BuildContext context) async {
+  /// Sets the initial [date] and [time] to the existing values for the given task.
+  @override
+  void initState() {
+    // Check that a reminder has been set first.
+    if (widget.task.isReminderSet) {
+      date = widget.task.date;
+      time = widget.task.time;
+    }
+
+    super.initState();
+  }
+
+  /// Provides an interface to select a date.
+  void _selectDate(BuildContext context) async {
+    // Show the date picker.
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: this.widget.task.isReminderSet ? this.widget.task.date : DateTime.now(),
+
+      // Set initial date to that of task if already set, otherwise now.
+      initialDate: date,
+
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != this.widget.task.date)
+
+    // Set new date if selected and different.
+    if (picked != null && picked != widget.task.date)
       setState(() {
         date = picked;
       });
   }
 
-  Future<Null> _selectTime(BuildContext context) async {
+  /// Provides an interface to select a time.
+  void _selectTime(BuildContext context) async {
+    // Show the time picker.
     final TimeOfDay picked = await showTimePicker(
       context: context,
-      initialTime: this.widget.task.isReminderSet ? this.widget.task.time : TimeOfDay.now(),
+
+      // Set initial time to that of task if already set. otherwise now.
+      initialTime: time,
     );
-    if (picked != null && picked != this.widget.task.time)
+
+    // Set new time if selected and different.
+    if (picked != null && picked != widget.task.time)
       setState(() {
         time = picked;
       });
   }
-
 }

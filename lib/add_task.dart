@@ -1,127 +1,62 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter_nudge_reminders/task_list.dart';
 import 'package:flutter_nudge_reminders/task.dart';
 import 'package:flutter_nudge_reminders/task_io.dart';
+import 'package:flutter_nudge_reminders/task_list.dart';
 
+/// A route for the user to enter and add tasks.
 class AddTask extends StatefulWidget {
-
   final callback;
-  AddTask(this.callback);
-
   Task task;
+
   int index;
+  AddTask(this.callback);
   AddTask.edit(this.callback, this.task, this.index);
 
   @override
   AddTaskState createState() => AddTaskState();
-
 }
 
+/// The state that allows a task to be added.
 class AddTaskState extends State<AddTask> {
-
+  /// A controller for text in the title field.
   TextEditingController titleController;
+
+  /// A controller for text in the body field.
   TextEditingController bodyController;
 
-  bool isEditMode() => widget.task ?? false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (isEditMode()) {
-      titleController = TextEditingController(text: widget.task.title);
-      bodyController = TextEditingController(text: widget.task.body);
-    } else {
-      titleController = TextEditingController();
-      bodyController = TextEditingController();
-    }
-
-  }
-
-  void saveTask(task) {
-
-    if (isEditMode()) {
-      if (widget.task.isReminderSet) task.setDateTime(widget.task.date, widget.task.time);
-      TaskListState.tasks[widget.index] = task;
-    } else {
-      TaskListState.tasks.add(task);
-    }
-
-    TaskIO.writeTasks(TaskListState.tasks);
-    widget.callback();
-    Navigator.pop(context);
-  }
-
-  void deleteTask() {
-
-    if (isEditMode()) {
-      TaskListState.tasks.removeAt(widget.index);
-      TaskIO.writeTasks(TaskListState.tasks);
-    }
-
-    widget.callback();
-    Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    titleController.dispose();
-    bodyController.dispose();
-    super.dispose();
-  }
-
+  /// Builds the interface for the user to enter task details.
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-        appBar: AppBar(
-            title: Text('Add New Task')
-        ),
-
+        appBar: AppBar(title: Text('Add New Task')),
         body: Center(
-
           child: Card(
             margin: EdgeInsets.all(15.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-
-                // Title entry
+                // The title entry field.
                 ListTile(
                   leading: Icon(Icons.title),
                   title: TextField(
                     controller: titleController,
                     autofocus: true,
                     decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Enter title'
-                    ),
+                        border: InputBorder.none, hintText: 'Enter title'),
                   ),
                 ),
 
-//                // Checkbox to remind X minutes early
-//                ListTile(
-//                  leading: Icon(Icons.check_box_outline_blank),
-//                  title: Text("Remind me 10 minutes early?"),
-//                  onTap: null,
-//                ),
-
-                // Optional body entry
+                // The (optional) body entry field.
                 Expanded(
-                  child:
-                  ListTile(
+                  child: ListTile(
                     title: TextField(
                       controller: bodyController,
                       autofocus: false,
                       maxLines: null,
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: 'Enter optional details'
-                      ),
+                          hintText: 'Enter optional details'),
                     ),
                   ),
                 ),
@@ -132,25 +67,21 @@ class AddTaskState extends State<AddTask> {
                     alignment: Alignment.bottomCenter,
                     child: ButtonBar(
 //                      alignment: MainAxisAlignment.spaceBetween,
-                    alignment: MainAxisAlignment.end,
+                      alignment: MainAxisAlignment.end,
                       children: <Widget>[
-//                        IconButton(
-//                          alignment: Alignment.centerLeft,
-//                          icon: Icon(Icons.alarm_add),
-//                          onPressed: null,
-//                        ),
                         Row(
                           children: <Widget>[
+                            // The delete button.
                             IconButton(
                               alignment: Alignment.centerRight,
                               icon: Icon(Icons.delete),
                               onPressed: deleteTask,
                             ),
+                            // The save button.
                             FlatButton(
                               child: const Text('SAVE'),
-                              onPressed: () => saveTask(
-                                  Task(titleController.text, bodyController.text)
-                              ),
+                              onPressed: () => saveTask(Task(
+                                  titleController.text, bodyController.text)),
                             ),
                           ],
                         ),
@@ -161,10 +92,66 @@ class AddTaskState extends State<AddTask> {
               ],
             ),
           ),
-
-        )
-    );
-
+        ));
   }
 
+  /// Deletes the current task.
+  void deleteTask() {
+    if (isEditMode()) {
+      // Remove from the task list.
+      TaskListState.tasks.removeAt(widget.index);
+      TaskIO.writeTasks(TaskListState.tasks);
+    }
+
+    // Dismiss.
+    widget.callback();
+    Navigator.pop(context);
+  }
+
+  /// Cleans up controllers.
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    titleController.dispose();
+    bodyController.dispose();
+    super.dispose();
+  }
+
+  /// Sets [titleController] and [bodyController] to previously specified values
+  /// if the task is being edited. Otherwise, they are default (blank).
+  @override
+  void initState() {
+    super.initState();
+
+    if (isEditMode()) {
+      // Use strings from existing task instance to set text values.
+      titleController = TextEditingController(text: widget.task.title);
+      bodyController = TextEditingController(text: widget.task.body);
+    } else {
+      titleController = TextEditingController();
+      bodyController = TextEditingController();
+    }
+  }
+
+  /// Checks if a task is being edited rather than added.
+  bool isEditMode() => widget.task ?? false;
+
+  /// Saves the task to [TaskListState.tasks] and writes to disk.
+  void saveTask(task) {
+    if (isEditMode()) {
+      // Edit the existing task in [TaskListState.tasks].
+      if (widget.task.isReminderSet)
+        task.setDateTime(widget.task.date, widget.task.time);
+      TaskListState.tasks[widget.index] = task;
+    } else {
+      // Add a new task.
+      TaskListState.tasks.add(task);
+    }
+
+    TaskIO.writeTasks(TaskListState.tasks);
+
+    // Dismiss.
+    widget.callback();
+    Navigator.pop(context);
+  }
 }
