@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'add_task.dart';
 import 'date_time_dialog.dart';
@@ -20,6 +21,12 @@ class TaskListState extends State<TaskList> {
   final _dateTimeStyle = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w300,
+  );
+
+  /// A style for reminder boxes.
+  final _reminderDecoration = BoxDecoration(
+    color: Colors.grey[300],
+    borderRadius: BorderRadius.all(Radius.circular(3.0)),
   );
 
   /// Shows the list of tasks.
@@ -79,16 +86,22 @@ class TaskListState extends State<TaskList> {
           itemBuilder: (context, i) {
             return Dismissible(
               key: Key(tasks[i].title),
-
+//              movementDuration: Duration(milliseconds: 50),
+              dismissThresholds: {
+                DismissDirection.startToEnd: 0.5,
+              },
               // Create a "leave behind" indicator to show this will delete the task.
               background: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                  ),
                   margin: const EdgeInsets.symmetric(
-                      horizontal: 10.0, vertical: 5.0),
-                  color: Colors.red,
+                      horizontal: 0.0, vertical: 5.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
                       child: Icon(Icons.delete),
                     ),
                   )),
@@ -109,14 +122,17 @@ class TaskListState extends State<TaskList> {
                 ));
               },
               child: Card(
+                elevation: 3.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
                 margin:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    const EdgeInsets.symmetric(horizontal: 0.0, vertical: 5.0),
 
                 // This allows the card to be tapped to edit the task.
                 child: InkWell(
                   onTap: () => _editTaskRoute(tasks[i], i),
                   child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 10.0),
+                    margin: EdgeInsets.symmetric(vertical: 5.0),
                     child: Column(
                       children: <Widget>[
                         // The title and body are shown in the main ListTile.
@@ -131,11 +147,13 @@ class TaskListState extends State<TaskList> {
                           subtitle:
                               tasks[i].isBodySet() ? Text(tasks[i].body) : null,
                           leading: IconButton(
-                            icon: Icon(tasks[i].isComplete
-                                ? Icons.check_box
-                                : Icons.check_box_outline_blank),
+                            icon: Icon(
+                                tasks[i].isComplete
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                                color:
+                                    tasks[i].isComplete ? Colors.green : null),
                             onPressed: () {
-
                               // Toggle completion state.
                               setState(() {
                                 tasks[i].toggleComplete();
@@ -148,9 +166,13 @@ class TaskListState extends State<TaskList> {
 
                           // Allow the option to add/edit a reminder.
                           trailing: IconButton(
-                            icon: Icon(tasks[i].isReminderSet
-                                ? Icons.alarm_on
-                                : Icons.alarm_add),
+                            icon: Icon(
+                              tasks[i].isReminderSet
+                                  ? Icons.alarm_on
+                                  : Icons.alarm_add,
+                              color:
+                                  tasks[i].isReminderSet ? Colors.green : null,
+                            ),
                             onPressed: () {
                               showDialog(
                                   context: context,
@@ -171,13 +193,22 @@ class TaskListState extends State<TaskList> {
                         if (tasks[i].isReminderSet)
                           // Show the user the date and time of the set reminder.
                           ListTile(
-                            title: Text(
-                              tasks[i].time.format(context),
-                              style: _dateTimeStyle,
+                            dense: true,
+                            trailing: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: _reminderDecoration,
+                              child: Text(
+                                tasks[i].time.format(context),
+                                style: _dateTimeStyle,
+                              ),
                             ),
-                            trailing: Text(
-                              tasks[i].date.toString().split(' ')[0],
-                              style: _dateTimeStyle,
+                            leading: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: _reminderDecoration,
+                              child: Text(
+                                DateFormat("dd-MM-yyyy").format(tasks[i].date),
+                                style: _dateTimeStyle,
+                              ),
                             ),
                           ),
                       ].where(notNull).toList(),
