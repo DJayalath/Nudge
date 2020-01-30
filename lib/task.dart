@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// A generic task.
 class Task {
   /// The task title.
@@ -10,9 +8,6 @@ class Task {
 
   /// The date the task should be completed by.
   var _selectedDate;
-
-  /// The time the task should be completed by.
-  var _selectedTime;
 
   /// The task completion status.
   var _isComplete = false;
@@ -30,8 +25,6 @@ class Task {
 
   bool get isReminderSet => _shouldRemind;
 
-  TimeOfDay get time => _selectedTime;
-
   String get title => _title;
 
   /// Checks if body has a non-empty string value.
@@ -41,14 +34,12 @@ class Task {
   void resetDateTime() {
     _shouldRemind = false;
     _selectedDate = null;
-    _selectedTime = null;
   }
 
-  /// Sets a reminder for the task with a [date] and [time] for completion.
-  void setDateTime(date, time) {
+  /// Sets a reminder for the task with a [date] for completion.
+  void setDateTime(date) {
     _shouldRemind = true;
     _selectedDate = date;
-    _selectedTime = time;
   }
 
   /// Toggles the completion status of the task.
@@ -85,34 +76,7 @@ class Task {
           return 1;
           break;
         case 0:
-          // [a] and [b] both are on the same date. Sort deadlock by soonest time.
-          // TODO: Make this more efficient.
-          final timeNow = TimeOfDay.now();
-
-          // Calculate times in hours.
-          final timeNowInHours =
-              timeNow.hour.toDouble() + (timeNow.minute.toDouble() / 60);
-          final timeOfAInHours =
-              a.time.hour.toDouble() + (a.time.minute.toDouble() / 60);
-          final timeOfBInHours =
-              b.time.hour.toDouble() + (b.time.minute.toDouble() / 60);
-
-          // Calculate time difference between now and the task times.
-          final timeUntilA = (timeOfAInHours - timeNowInHours).abs();
-          final timeUntilB = (timeOfBInHours - timeNowInHours).abs();
-
-          // Calculate the difference between the tasks' upcoming times.
-          final difference = timeUntilA - timeUntilB;
-
-          // Put the soonest task on top
-          if (difference > 0) {
-            return -1;
-          } else if (difference < 0) {
-            return 1;
-          } else {
-            // If both tasks at exact same time, make no distinction.
-            return 0;
-          }
+          return 0;
           break;
       }
     }

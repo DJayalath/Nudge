@@ -203,7 +203,7 @@ class TaskListState extends State<TaskList> {
                               padding: const EdgeInsets.all(8.0),
                               decoration: _reminderDecoration,
                               child: Text(
-                                tasks[i].time.format(context),
+                                DateFormat("hh:mm").format(tasks[i].date),
                                 style: _dateTimeStyle,
                               ),
                             ),

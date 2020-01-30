@@ -146,7 +146,7 @@ class AddTaskState extends State<AddTask> {
     if (isEditMode()) {
       // Edit the existing task in [TaskListState.tasks].
       if (widget.task.isReminderSet)
-        task.setDateTime(widget.task.date, widget.task.time);
+        task.setDateTime(widget.task.date);
       TaskListState.tasks[widget.index] = task;
     } else {
       // Add a new task.

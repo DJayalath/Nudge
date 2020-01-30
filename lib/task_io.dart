@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'task.dart';
@@ -38,16 +37,15 @@ class TaskIO {
         // Create a new task instance with the title, [parts[0]], and body [[parts[1]].
         final task = Task(parts[0], parts[1]);
 
-        // Check if a reminder, [[parts[5]] is set.
-        if (parts[5] == "T") {
+        // Check if a reminder, [[parts[3]] is set.
+        if (parts[3] == "T") {
           task.setDateTime(
             DateTime.fromMillisecondsSinceEpoch(int.parse(parts[2])),
-            TimeOfDay(hour: int.parse(parts[3]), minute: int.parse(parts[4])),
           );
         }
 
-        // Check if the task has been completed - [[parts[6]].
-        if (parts[6] == "T") task.toggleComplete();
+        // Check if the task has been completed - [[parts[4]].
+        if (parts[4] == "T") task.toggleComplete();
 
         // Add the task to the working list.
         tasks.add(task);
@@ -76,8 +74,6 @@ class TaskIO {
       tasksStringFormatted += "${task.title},"
           "${task.body},"
           "${task.isReminderSet ? task.date.millisecondsSinceEpoch : "F"},"
-          "${task.isReminderSet ? task.time.hour : "F"},"
-          "${task.isReminderSet ? task.time.minute : "F"},"
           "${task.isReminderSet ? "T" : "F"},"
           "${task.isComplete ? "T" : "F"}"
           "\n";
