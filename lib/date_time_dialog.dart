@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'task.dart';
+import 'task_list.dart';
+import 'task_io.dart';
 
 /// A dialog to set date and time of a task.
 class DateTimeDialog extends StatefulWidget {
@@ -87,6 +89,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
               icon: Icon(Icons.delete),
               onPressed: () {
                 widget.task.resetDateTime();
+                TaskIO.writeTasks(TaskListState.tasks);
                 widget.callback();
                 Navigator.pop(context);
               },
@@ -103,7 +106,11 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                 FlatButton(
                   child: const Text('SAVE'),
                   onPressed: () {
-                    widget.task.setDateTime(date, time);
+                    // Combine date and time into a single DateTime instance.
+                    widget.task.setDateTime(
+                        DateTime(date.year, date.month, date.day, time.hour, time.minute),
+                    );
+                    TaskIO.writeTasks(TaskListState.tasks);
                     widget.callback();
                     Navigator.pop(context);
                   },
@@ -122,8 +129,8 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   void initState() {
     // Check that a reminder has been set first.
     if (widget.task.isReminderSet) {
-      date = widget.task.date;
-      time = widget.task.time;
+      date = DateTime(widget.task.date.year, widget.task.date.month, widget.task.date.day);
+      time = TimeOfDay(hour: widget.task.date.hour, minute: widget.task.date.minute);
     }
 
     super.initState();
@@ -143,7 +150,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
     );
 
     // Set new date if selected and different.
-    if (picked != null && picked != widget.task.date)
+    if (picked != null)
       setState(() {
         date = picked;
       });
@@ -160,7 +167,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
     );
 
     // Set new time if selected and different.
-    if (picked != null && picked != widget.task.time)
+    if (picked != null)
       setState(() {
         time = picked;
       });
