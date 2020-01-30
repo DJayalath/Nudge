@@ -37,8 +37,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   Widget build(BuildContext context) {
     return SimpleDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(3.0))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(3.0))),
       children: <Widget>[
         ListTile(
           leading: Icon(Icons.calendar_today),
@@ -69,7 +68,6 @@ class DateTimeDialogState extends State<DateTimeDialog> {
         ButtonBar(
           alignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
@@ -78,27 +76,24 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                 Navigator.pop(context);
               },
             ),
-
             Row(
-                children: <Widget>[
-
-                  FlatButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () {
-                      widget.callback();
-                      Navigator.pop(context);
-                    },
-                  ),
-
-                  FlatButton(
-                    child: const Text('SAVE'),
-                    onPressed: () {
-                      widget.task.setDateTime(date, time);
-                      widget.callback();
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
+              children: <Widget>[
+                FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () {
+                    widget.callback();
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  child: const Text('SAVE'),
+                  onPressed: () {
+                    widget.task.setDateTime(date, time);
+                    widget.callback();
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
           ],
         ),
