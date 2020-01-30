@@ -99,6 +99,9 @@ class TaskListState extends State<TaskList> {
                   tasks.removeAt(i);
                 });
 
+                // Write to disk.
+                TaskIO.writeTasks(tasks);
+
                 // Indicate that a task has been dismissed to the user.
                 Scaffold.of(context).showSnackBar(SnackBar(
                   content: Text("Task dismissed"),
@@ -132,9 +135,14 @@ class TaskListState extends State<TaskList> {
                                 ? Icons.check_box
                                 : Icons.check_box_outline_blank),
                             onPressed: () {
+
+                              // Toggle completion state.
                               setState(() {
                                 tasks[i].toggleComplete();
                               });
+
+                              // Write to disk.
+                              TaskIO.writeTasks(tasks);
                             },
                           ),
 
