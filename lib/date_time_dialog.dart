@@ -65,6 +65,21 @@ class DateTimeDialogState extends State<DateTimeDialog> {
           ),
         ),
 
+        // TODO: Add to Task class and persistent across disk writes.
+        SwitchListTile(
+          secondary: Icon(Icons.alarm),
+          dense: false,
+          title: Text("Early reminder"),
+          value: false,
+          onChanged: (bool value) {
+
+          },
+          isThreeLine: true,
+          subtitle: Container(
+              child: Text("1 hour"),
+          ),
+        ),
+
         ButtonBar(
           alignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[

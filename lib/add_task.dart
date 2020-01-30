@@ -32,6 +32,9 @@ class AddTaskState extends State<AddTask> {
         appBar: AppBar(title: Text('Add New Task')),
         body: Center(
           child: Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(3.0))),
+            elevation: 3.0,
             margin: EdgeInsets.all(15.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -44,9 +47,11 @@ class AddTaskState extends State<AddTask> {
                     controller: titleController,
                     autofocus: true,
                     decoration: InputDecoration(
-                        border: InputBorder.none, hintText: 'Enter title'),
+                        border: InputBorder.none, hintText: 'New task'),
                   ),
                 ),
+
+                Divider(thickness: 1.0),
 
                 // The (optional) body entry field.
                 Expanded(
@@ -56,8 +61,7 @@ class AddTaskState extends State<AddTask> {
                       autofocus: false,
                       maxLines: null,
                       decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Enter optional details'),
+                          border: InputBorder.none, hintText: 'Add details'),
                     ),
                   ),
                 ),

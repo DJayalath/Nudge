@@ -188,7 +188,12 @@ class TaskListState extends State<TaskList> {
 
                         // Separate main title/body from (optional) reminder information.
                         if (tasks[i].isReminderSet)
-                          Divider(),
+                          Divider(
+                            indent: 15.0,
+                            endIndent: 15.0,
+                            thickness: 1.0,
+                            color: Colors.grey[300],
+                          ),
 
                         if (tasks[i].isReminderSet)
                           // Show the user the date and time of the set reminder.
