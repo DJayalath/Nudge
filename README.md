@@ -5,7 +5,7 @@ A more intelligent tasks/reminders app.
 ## Roadmap
 ### Immediate
 - ~~Set task completion date and time~~
-- Working reminder notifications
+- ~~Working reminder notifications~~
 - ~~Sort task order in display screen~~ (Timeless first, then soonest tasks to complete)
 - Allow undoing in snackbar on task dismiss
 - ~~Checkbox completion of tasks~~
