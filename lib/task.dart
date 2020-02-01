@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'notification_scheduler.dart';
+
 /// A generic task.
 class Task {
   /// The task title.
@@ -34,16 +38,37 @@ class Task {
   void resetDateTime() {
     _shouldRemind = false;
     _selectedDate = null;
+
+    NotificationScheduler.deleteNotification(this);
   }
 
   /// Sets a reminder for the task with a [date] for completion.
   void setDateTime(date) {
     _shouldRemind = true;
     _selectedDate = date;
+
+    NotificationScheduler.scheduleNotification(this);
   }
 
   /// Toggles the completion status of the task.
   void toggleComplete() => _isComplete = !_isComplete;
+
+  static const int p = 53;
+  static int m = pow(10, 9) + 9;
+
+  /// Computes polynomial rolling hash function (p, m)
+  int computeHash() {
+
+    var hashVal = 0;
+    var i = 0;
+
+    for (int s in title.codeUnits) {
+      hashVal += s * pow(p, i);
+      i++;
+    }
+
+    return hashVal % m;
+  }
 
   /// Sorts tasks by acting as comparator function.
   ///
