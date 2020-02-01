@@ -34,6 +34,8 @@ class DateTimeDialogState extends State<DateTimeDialog> {
     fontWeight: FontWeight.w400,
   );
 
+  var _dropDownValue = '5';
+
   /// Builds the dialog as a simple selection menu.
   @override
   Widget build(BuildContext context) {
@@ -78,8 +80,31 @@ class DateTimeDialogState extends State<DateTimeDialog> {
           },
           isThreeLine: true,
           subtitle: Container(
-              child: Text("1 hour"),
+            padding: const EdgeInsets.all(0.0),
+            margin: const EdgeInsets.all(0),
+            decoration: _selectorDecoration,
+            child: DropdownButton<String>(
+              value: _dropDownValue,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 20,
+              elevation: 16,
+              onChanged: (String newValue) {
+                setState(() {
+                  _dropDownValue = newValue;
+                });
+              },
+              items: <String>['5', '15', '30', '45']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text("$value minutes"),
+                );
+              }).toList(),
+            ),
           ),
+//          subtitle: Container(
+//              child: Text("1 hour"),
+//          ),
         ),
 
         ButtonBar(
