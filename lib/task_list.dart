@@ -5,6 +5,7 @@ import 'add_task.dart';
 import 'date_time_dialog.dart';
 import 'task.dart';
 import 'task_io.dart';
+import 'notification_scheduler.dart';
 
 /// The list of tasks displayed in the home page of the app.
 class TaskList extends StatefulWidget {
@@ -58,11 +59,20 @@ class TaskListState extends State<TaskList> {
   @override
   void initState() {
     super.initState();
+
+    // Initialise local notifications
+    NotificationScheduler.init();
+
+    // Read tasks from disk.
     TaskIO.readTasks().then((List<Task> taskList) {
       setState(() {
         tasks = taskList;
       });
     });
+  }
+
+  Future onSelectNotification(String payload) {
+    debugPrint("payload : $payload");
   }
 
   /// Builds the list of tasks to show.
@@ -109,6 +119,7 @@ class TaskListState extends State<TaskList> {
               onDismissed: (direction) {
                 // Remove from tasks
                 setState(() {
+                  NotificationScheduler.deleteNotification(tasks[i]);
                   tasks.removeAt(i);
                 });
 
@@ -203,7 +214,7 @@ class TaskListState extends State<TaskList> {
                               padding: const EdgeInsets.all(8.0),
                               decoration: _reminderDecoration,
                               child: Text(
-                                DateFormat("hh:mm").format(tasks[i].date),
+                                DateFormat("HH:mm").format(tasks[i].date),
                                 style: _dateTimeStyle,
                               ),
                             ),

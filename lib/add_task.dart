@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_nudge_reminders/notification_scheduler.dart';
 
 import 'task.dart';
 import 'task_io.dart';
@@ -104,6 +105,7 @@ class AddTaskState extends State<AddTask> {
   void deleteTask() {
     if (isEditMode()) {
       // Remove from the task list.
+      NotificationScheduler.deleteNotification(TaskListState.tasks[widget.index]);
       TaskListState.tasks.removeAt(widget.index);
       TaskIO.writeTasks(TaskListState.tasks);
     }
