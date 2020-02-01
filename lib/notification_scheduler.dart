@@ -29,14 +29,22 @@ class NotificationScheduler {
       await flutterLocalNotificationsPlugin.cancel(hash);
     } catch (e) {}
 
+    var message = 'Due now';
+    var time = task.date;
+    if (task.isEarlyReminderSet) {
+      time = time.subtract(task.earlyReminder);
+      var durationInMinutes = task.earlyReminder.inMinutes;
+      message = 'In $durationInMinutes ${(durationInMinutes > 45) ? "hours" : "minutes"}';
+    }
+
     var android = AndroidNotificationDetails('channel id', 'channel NAME', 'CHANNEL DESCRIPTION');
     var iOS = IOSNotificationDetails();
     var platform = NotificationDetails(android, iOS);
     await flutterLocalNotificationsPlugin.schedule(
         hash,
         task.title,
-        'Tap to mark complete',
-        task.date,
+        message,
+        time,
         platform, payload: task.title);
   }
 

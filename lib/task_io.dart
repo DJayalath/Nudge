@@ -47,6 +47,11 @@ class TaskIO {
         // Check if the task has been completed - [[parts[4]].
         if (parts[4] == "T") task.toggleComplete();
 
+        // Set early reminders
+        if (parts[5] != "F") {
+          task.setEarlyReminder(Duration(minutes: int.parse(parts[5])));
+        }
+
         // Add the task to the working list.
         tasks.add(task);
       }
@@ -75,7 +80,8 @@ class TaskIO {
           "${task.body},"
           "${task.isReminderSet ? task.date.millisecondsSinceEpoch : "F"},"
           "${task.isReminderSet ? "T" : "F"},"
-          "${task.isComplete ? "T" : "F"}"
+          "${task.isComplete ? "T" : "F"},"
+          "${task.isEarlyReminderSet ?  task.earlyReminder.inMinutes : "F"}"
           "\n";
 
     }

@@ -22,6 +22,9 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   /// The time of the task.
   var time = TimeOfDay.now();
 
+  /// Early reminder status
+  var earlyReminder = false;
+
   /// A style for selector boxes.
   final _selectorDecoration = BoxDecoration(
     color: Colors.grey[300],
@@ -35,6 +38,8 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   );
 
   var _dropDownValue = '5';
+  List<String> _dropDownValues = ['5', '15', '30', '45'];
+  var _dropDownTime = 'minutes';
 
   /// Builds the dialog as a simple selection menu.
   @override
@@ -73,39 +78,77 @@ class DateTimeDialogState extends State<DateTimeDialog> {
         SwitchListTile(
           secondary: Icon(Icons.alarm),
           dense: false,
-          title: Text("Early reminder"),
-          value: false,
-          onChanged: (bool value) {
-
-          },
-          isThreeLine: true,
-          subtitle: Container(
-            padding: const EdgeInsets.all(0.0),
-            margin: const EdgeInsets.all(0),
-            decoration: _selectorDecoration,
-            child: DropdownButton<String>(
-              value: _dropDownValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 20,
-              elevation: 16,
-              onChanged: (String newValue) {
-                setState(() {
-                  _dropDownValue = newValue;
-                });
-              },
-              items: <String>['5', '15', '30', '45']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text("$value minutes"),
-                );
-              }).toList(),
-            ),
+          title: Text(
+              "Early reminder?",
+//            style: TextStyle(fontSize: 14),
           ),
-//          subtitle: Container(
-//              child: Text("1 hour"),
-//          ),
+          value: earlyReminder,
+          onChanged: (bool value) {
+            setState(() {
+              earlyReminder = value;
+            });
+          },
         ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: DropdownButton<String>(
+                  value: _dropDownValue,
+                  disabledHint: Text("$_dropDownValue"),
+                  icon: Icon(Icons.arrow_drop_down),
+                  iconSize: 20,
+                  elevation: 16,
+                  onChanged: !earlyReminder ? null : (String newValue) {
+                    setState(() {
+                      _dropDownValue = newValue;
+                    });
+                  },
+                  items: _dropDownValues
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text("$value", textAlign: TextAlign.center,),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: DropdownButton<String>(
+                  value: _dropDownTime,
+                  disabledHint: Text("$_dropDownTime"),
+                  icon: Icon(Icons.arrow_drop_down),
+                  iconSize: 20,
+                  elevation: 16,
+                  onChanged: !earlyReminder ? null : (String newValue) {
+                    setState(() {
+                      _dropDownTime = newValue;
+
+                      if (_dropDownTime == "minutes") {
+                        _dropDownValue = '5';
+                        _dropDownValues = ['5', '15', '30', '45'];
+                      } else {
+                        _dropDownValue = '1';
+                        _dropDownValues = ['1', '2', '4', '6'];
+                      }
+
+                    });
+                  },
+                  items: <String>['hours', 'minutes']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text("$value", textAlign: TextAlign.center,),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
 
         ButtonBar(
           alignment: MainAxisAlignment.spaceBetween,
@@ -113,6 +156,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
+                widget.task.resetEarlyReminder();
                 widget.task.resetDateTime();
                 TaskIO.writeTasks(TaskListState.tasks);
                 widget.callback();
@@ -131,6 +175,12 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                 FlatButton(
                   child: const Text('SAVE'),
                   onPressed: () {
+                    if (earlyReminder) {
+                      var duration = Duration(minutes: ((_dropDownTime == "minutes") ? 1 : 60) * int.parse(_dropDownValue));
+                      widget.task.setEarlyReminder(duration);
+                    } else {
+                      widget.task.resetEarlyReminder();
+                    }
                     // Combine date and time into a single DateTime instance.
                     widget.task.setDateTime(
                         DateTime(date.year, date.month, date.day, time.hour, time.minute),
@@ -156,6 +206,17 @@ class DateTimeDialogState extends State<DateTimeDialog> {
     if (widget.task.isReminderSet) {
       date = DateTime(widget.task.date.year, widget.task.date.month, widget.task.date.day);
       time = TimeOfDay(hour: widget.task.date.hour, minute: widget.task.date.minute);
+      if (widget.task.isEarlyReminderSet) {
+        var duration = widget.task.earlyReminder.inMinutes;
+        if (duration > 45) {
+          _dropDownTime = "hours";
+          _dropDownValue = "${duration / 60}";
+          _dropDownValues = ['1', '2', '4', '6'];
+        } else {
+          _dropDownTime = "minutes";
+          _dropDownValue = "$duration";
+        }
+      }
     }
 
     super.initState();

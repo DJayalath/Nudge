@@ -13,7 +13,7 @@ A more intelligent tasks/reminders app.
 ### Soon
 - Automatic date/time locale formatting
 - Recurring tasks
-- Set independent remind times (e.g. 10 minutes before task completion time)
+- ~~Set independent remind times (e.g. 10 minutes before task completion time)~~
 - Consistent, clean, and user-friendly theme
 - Sub-tasks
 ### Later

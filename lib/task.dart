@@ -19,6 +19,11 @@ class Task {
   /// Whether the task has a reminder set.
   var _shouldRemind = false;
 
+  /// Whether the task reminder also has an early reminder.
+  var _earlyReminder = false;
+
+  var _earlyReminderDuration;
+
   Task(this._title, this._body);
 
   String get body => _body;
@@ -28,6 +33,10 @@ class Task {
   bool get isComplete => _isComplete;
 
   bool get isReminderSet => _shouldRemind;
+
+  bool get isEarlyReminderSet => _earlyReminder;
+
+  Duration get earlyReminder => _earlyReminderDuration;
 
   String get title => _title;
 
@@ -42,12 +51,24 @@ class Task {
     NotificationScheduler.deleteNotification(this);
   }
 
+  /// Removes an early reminder
+  void resetEarlyReminder() {
+    _earlyReminder = false;
+    _earlyReminderDuration = null;
+  }
+
   /// Sets a reminder for the task with a [date] for completion.
   void setDateTime(date) {
     _shouldRemind = true;
     _selectedDate = date;
 
     NotificationScheduler.scheduleNotification(this);
+  }
+
+  /// Sets early reminder time
+  void setEarlyReminder(duration) {
+    _earlyReminder = true;
+    _earlyReminderDuration = duration;
   }
 
   /// Toggles the completion status of the task.
