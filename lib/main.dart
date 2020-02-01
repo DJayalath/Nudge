@@ -13,9 +13,15 @@ class NudgeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+//      themeMode: ThemeMode.dark,
+//      darkTheme: ThemeData(
+////        primarySwatch: Colors.black45,
+////        primarySwatch: Colors.grey,
+//      colorScheme: ColorScheme.dark(),
+//      ),
       title: 'Nudge',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.deepPurple,
       ),
       home: TaskList(),
     );
