@@ -60,19 +60,27 @@ class TaskListState extends State<TaskList> {
   void initState() {
     super.initState();
 
-    // Initialise local notifications
-    NotificationScheduler.init();
-
     // Read tasks from disk.
     TaskIO.readTasks().then((List<Task> taskList) {
       setState(() {
         tasks = taskList;
       });
+
+      // Initialise local notifications
+      NotificationScheduler.init(onSelectNotification);
     });
   }
 
   Future onSelectNotification(String payload) {
-    debugPrint("payload : $payload");
+    setState(() {
+
+      for (Task task in tasks) {
+        if (payload == task.title) {
+          if (!task.isComplete) task.toggleComplete();
+        }
+      }
+
+    });
   }
 
   /// Builds the list of tasks to show.

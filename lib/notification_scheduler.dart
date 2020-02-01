@@ -7,12 +7,12 @@ class NotificationScheduler {
   /// Flutter local notifications plugin instance.
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-  static void init() {
+  static void init(selectionFunction) {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var android = AndroidInitializationSettings('mipmap/ic_launcher');
     var iOS = IOSInitializationSettings();
     var initSettings = InitializationSettings(android, iOS);
-    flutterLocalNotificationsPlugin.initialize(initSettings);
+    flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: selectionFunction);
   }
 
   static deleteNotification(Task task) async {
@@ -35,9 +35,9 @@ class NotificationScheduler {
     await flutterLocalNotificationsPlugin.schedule(
         hash,
         task.title,
-        '1',
+        'Tap to mark complete',
         task.date,
-        platform, payload: 'Item');
+        platform, payload: task.title);
   }
 
 }
