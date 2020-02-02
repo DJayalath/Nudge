@@ -34,8 +34,8 @@ class TaskIO {
         // Split by commas (file is formatted as lines of comma-separated variables).
         final parts = line.split(',');
 
-        // Create a new task instance with the title, [parts[0]], and body [[parts[1]].
-        final task = Task(parts[0], parts[1]);
+        // Create a new task instance with the title, [parts[0]], body [[parts[1]], and id [[parts[6]].
+        final task = Task(parts[0], parts[1], parts[6]);
 
         // Check if a reminder, [[parts[3]] is set.
         if (parts[3] == "T") {
@@ -82,6 +82,7 @@ class TaskIO {
           "${task.isReminderSet ? "T" : "F"},"
           "${task.isComplete ? "T" : "F"},"
           "${task.isEarlyReminderSet ?  task.earlyReminder.inMinutes : "F"}"
+          "${task.id}"
           "\n";
 
     }
