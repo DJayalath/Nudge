@@ -175,6 +175,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                 FlatButton(
                   child: const Text('SAVE'),
                   onPressed: () {
+                    // Must set early reminder BEFORE actual reminder because actual reminder method sets notification.
                     if (earlyReminder) {
                       var duration = Duration(minutes: ((_dropDownTime == "minutes") ? 1 : 60) * int.parse(_dropDownValue));
                       widget.task.setEarlyReminder(duration);
