@@ -1,9 +1,14 @@
 import 'dart:math';
 
 import 'notification_scheduler.dart';
+import 'task_list.dart';
 
 /// A generic task.
 class Task {
+
+  /// The unique task ID.
+  var _id;
+
   /// The task title.
   final _title;
 
@@ -24,7 +29,20 @@ class Task {
 
   var _earlyReminderDuration;
 
-  Task(this._title, this._body);
+  Task(this._title, this._body, [this._id]) {
+
+    // Generate a new unique ID if none provided
+    if (_id == null) {
+      int maxID = 0;
+      for (Task task in TaskListState.tasks) {
+        if (task.id > maxID) maxID = task.id;
+      }
+      _id = maxID + 1;
+    }
+
+  }
+
+  int get id => _id;
 
   String get body => _body;
 
@@ -73,23 +91,6 @@ class Task {
 
   /// Toggles the completion status of the task.
   void toggleComplete() => _isComplete = !_isComplete;
-
-  static const int p = 53;
-  static int m = pow(10, 9) + 9;
-
-  /// Computes polynomial rolling hash function (p, m)
-  int computeHash() {
-
-    var hashVal = 0;
-    var i = 0;
-
-    for (int s in title.codeUnits) {
-      hashVal += s * pow(p, i);
-      i++;
-    }
-
-    return hashVal % m;
-  }
 
   /// Sorts tasks by acting as comparator function.
   ///
