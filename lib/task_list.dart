@@ -74,11 +74,11 @@ class TaskListState extends State<TaskList> {
   Future onSelectNotification(String payload) {
     setState(() {
 
-      for (Task task in tasks) {
-        if (payload == task.title) {
-          if (!task.isComplete) task.toggleComplete();
-        }
-      }
+//      for (Task task in tasks) {
+//        if (payload == task.title) {
+//          if (!task.isComplete) task.toggleComplete();
+//        }
+//      }
 
     });
   }
