@@ -208,14 +208,16 @@ class DateTimeDialogState extends State<DateTimeDialog> {
       date = DateTime(widget.task.date.year, widget.task.date.month, widget.task.date.day);
       time = TimeOfDay(hour: widget.task.date.hour, minute: widget.task.date.minute);
       if (widget.task.isEarlyReminderSet) {
+        earlyReminder = true;
         var duration = widget.task.earlyReminder.inMinutes;
         if (duration > 45) {
           _dropDownTime = "hours";
-          _dropDownValue = "${duration / 60}";
+          _dropDownValue = "${duration ~/ 60}";
           _dropDownValues = ['1', '2', '4', '6'];
         } else {
           _dropDownTime = "minutes";
           _dropDownValue = "$duration";
+          _dropDownValues = ['5', '15', '30', '45'];
         }
       }
     }
