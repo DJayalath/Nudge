@@ -2,13 +2,21 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'task.dart';
 
+/// A utility class for notification scheduling.
 class NotificationScheduler {
 
+  /// A multiplier to generate unique early reminder notification IDs
+  /// that can still be attached to a task ID by dividing.
+  ///
+  /// WARNING: This limits the max. number of tasks in the worst case
+  /// (where all tasks have early reminders) to [EARLY_REMINDER_UNIQUE_CONSTANT].
   static const int EARLY_REMINDER_UNIQUE_CONSTANT = 1000;
 
   /// Flutter local notifications plugin instance.
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
+  /// Initialises [flutterLocalNotificationsPlugin] with platform settings and
+  /// an on notification selection function - [selectionFunction].
   static void init([selectionFunction]) {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var android = AndroidInitializationSettings('mipmap/ic_launcher');
@@ -17,6 +25,10 @@ class NotificationScheduler {
     flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: selectionFunction);
   }
 
+  /// Attempts to cancel notifications scheduled for [task].
+  ///
+  /// This includes attempting to cancel any early reminder notifications
+  /// that may have been set for [task].
   static deleteNotification(Task task) async {
     try {
       await flutterLocalNotificationsPlugin.cancel(task.id);
@@ -24,15 +36,19 @@ class NotificationScheduler {
     } catch (e) {}
   }
 
+  /// Attempts to schedule notifications for [task] based on [task.date] and
+  /// (if necessary), [task.earlyReminder].
   static scheduleNotification(Task task) async {
 
+    // Attempt to delete existing notifications for this task in case it is being edited.
     deleteNotification(task);
 
-    var message = 'Due now';
-
+    // Set and retrieve notification details for scheduling.
     var android = AndroidNotificationDetails('channel id', 'channel NAME', 'CHANNEL DESCRIPTION');
     var iOS = IOSNotificationDetails();
     var platform = NotificationDetails(android, iOS);
+
+    var message = 'Due now';
 
     // Schedule main notification.
     await flutterLocalNotificationsPlugin.schedule(
@@ -40,14 +56,13 @@ class NotificationScheduler {
         task.title,
         message,
         task.date,
-        platform, payload: task.title
+        platform,
+        payload: "${task.id}",
     );
 
     // Add another, earlier notification if needed.
     if (task.isEarlyReminderSet) {
 
-      var time = task.date;
-      time = time.subtract(task.earlyReminder);
       var durationInMinutes = task.earlyReminder.inMinutes;
       if (durationInMinutes > 45) {
         message = 'In ${durationInMinutes ~/ 60} hours';
@@ -56,11 +71,12 @@ class NotificationScheduler {
       }
 
       await flutterLocalNotificationsPlugin.schedule(
-          task.id * EARLY_REMINDER_UNIQUE_CONSTANT, // TODO: This limits max. unique tasks to 1000 if all have early reminders.
+          task.id * EARLY_REMINDER_UNIQUE_CONSTANT,
           task.title,
           message,
-          time,
-          platform, payload: task.title
+          task.date.subtract(task.earlyReminder),
+          platform,
+          payload: "${task.id}",
       );
     }
   }
