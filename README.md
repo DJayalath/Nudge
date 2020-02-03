@@ -11,6 +11,7 @@ A more intelligent tasks/reminders app.
 - ~~Checkbox completion of tasks~~
 - ~~Persistent storage of tasks~~
 ### Soon
+- Reorderable task list
 - Automatic date/time locale formatting
 - Recurring tasks
 - ~~Set independent remind times (e.g. 10 minutes before task completion time)~~
