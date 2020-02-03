@@ -67,19 +67,7 @@ class TaskListState extends State<TaskList> {
       });
 
       // Initialise local notifications
-      NotificationScheduler.init(onSelectNotification);
-    });
-  }
-
-  Future onSelectNotification(String payload) {
-    setState(() {
-
-//      for (Task task in tasks) {
-//        if (payload == task.title) {
-//          if (!task.isComplete) task.toggleComplete();
-//        }
-//      }
-
+      NotificationScheduler.init();
     });
   }
 
