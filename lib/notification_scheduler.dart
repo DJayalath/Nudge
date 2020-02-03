@@ -9,7 +9,7 @@ class NotificationScheduler {
   /// Flutter local notifications plugin instance.
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-  static void init(selectionFunction) {
+  static void init([selectionFunction]) {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var android = AndroidInitializationSettings('mipmap/ic_launcher');
     var iOS = IOSInitializationSettings();
@@ -49,7 +49,11 @@ class NotificationScheduler {
       var time = task.date;
       time = time.subtract(task.earlyReminder);
       var durationInMinutes = task.earlyReminder.inMinutes;
-      message = 'In $durationInMinutes ${(durationInMinutes > 45) ? "hours" : "minutes"}';
+      if (durationInMinutes > 45) {
+        message = 'In ${durationInMinutes ~/ 60} hours';
+      } else {
+        message = 'In $durationInMinutes minutes';
+      }
 
       await flutterLocalNotificationsPlugin.schedule(
           task.id * EARLY_REMINDER_UNIQUE_CONSTANT, // TODO: This limits max. unique tasks to 1000 if all have early reminders.
