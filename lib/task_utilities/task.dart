@@ -1,19 +1,15 @@
-import 'dart:math';
-
-import 'notification_scheduler.dart';
-import 'task_list.dart';
+import 'task_manager.dart';
 
 /// A generic task.
 class Task {
-
   /// The unique task ID.
   var _id;
 
   /// The task title.
-  final _title;
+  var _title;
 
   /// Additional information about the task.
-  final _body;
+  var _body;
 
   /// The date the task should be completed by.
   var _selectedDate;
@@ -27,70 +23,96 @@ class Task {
   /// Whether the task reminder also has an early reminder.
   var _earlyReminder = false;
 
+  /// The duration of the early reminder before [_selectedDate]
   var _earlyReminderDuration;
 
-  Task(this._title, this._body, [this._id]) {
+  /// The instance of [TaskManager] to update
+  var _taskManager = TaskManager();
 
-    // Generate a new unique ID if none provided
-    if (_id == null) {
-      int maxID = 0;
-      for (Task task in TaskListState.tasks) {
-        if (task.id > maxID) maxID = task.id;
-      }
-      _id = maxID + 1;
-    }
-
-  }
-
-  int get id => _id;
+  Task(this._title, this._body, this._id);
 
   String get body => _body;
 
+  /// Sets a new body and handles updates.
+  set body(String newBody) {
+    _body = newBody;
+    _taskManager.updateIO();
+  }
+
   DateTime get date => _selectedDate;
-
-  bool get isComplete => _isComplete;
-
-  bool get isReminderSet => _shouldRemind;
-
-  bool get isEarlyReminderSet => _earlyReminder;
 
   Duration get earlyReminder => _earlyReminderDuration;
 
+  int get id => _id;
+
+  bool get isComplete => _isComplete;
+
+  bool get isEarlyReminderSet => _earlyReminder;
+
+  bool get isReminderSet => _shouldRemind;
+
   String get title => _title;
 
+  /// Sets a new title and handles updates.
+  set title(String newTitle) {
+    _title = newTitle;
+    _taskManager.updateNotification(this);
+    _taskManager.updateIO();
+  }
+
   /// Checks if body has a non-empty string value.
-  bool isBodySet() => _body != "";
+  bool isBodySet() => body != "";
 
   /// Removes the task reminder.
   void resetDateTime() {
     _shouldRemind = false;
     _selectedDate = null;
 
-    NotificationScheduler.deleteNotification(this);
+    _taskManager.deleteNotification(this);
+    _taskManager.updateIO();
   }
 
   /// Removes an early reminder
   void resetEarlyReminder() {
     _earlyReminder = false;
     _earlyReminderDuration = null;
+
+    _taskManager.updateNotification(this);
+    _taskManager.updateIO();
   }
 
   /// Sets a reminder for the task with a [date] for completion.
-  void setDateTime(date) {
+  /// [readMode] prevents double attempting notifications/IO in
+  /// order to reduce load times.
+  void setDateTime(date, {readMode = false}) {
     _shouldRemind = true;
     _selectedDate = date;
 
-    NotificationScheduler.scheduleNotification(this);
+    if (!readMode) {
+      _taskManager.updateNotification(this);
+      _taskManager.updateIO();
+    }
   }
 
-  /// Sets early reminder time
-  void setEarlyReminder(duration) {
+  /// Sets early reminder time. [readMode] prevents double attempting
+  /// notifications/IO in order to reduce load times.
+  void setEarlyReminder(duration, {readMode = false}) {
     _earlyReminder = true;
     _earlyReminderDuration = duration;
+
+    if (!readMode) {
+      _taskManager.updateNotification(this);
+      _taskManager.updateIO();
+    }
   }
 
-  /// Toggles the completion status of the task.
-  void toggleComplete() => _isComplete = !_isComplete;
+  /// Toggles the completion status of the task. [readMode] prevents
+  /// double attempting notifications/IO in order to reduce load times.
+  void toggleComplete({readMode = false}) {
+    _isComplete = !_isComplete;
+
+    if (!readMode) _taskManager.updateIO();
+  }
 
   /// Sorts tasks by acting as comparator function.
   ///
