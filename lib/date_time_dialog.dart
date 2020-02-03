@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'task.dart';
-import 'task_list.dart';
-import 'task_io.dart';
+import 'task_utilities/task.dart';
 
 /// A dialog to set date and time of a task.
 class DateTimeDialog extends StatefulWidget {
@@ -16,7 +14,6 @@ class DateTimeDialog extends StatefulWidget {
 
 /// A state to control displaying the dialog.
 class DateTimeDialogState extends State<DateTimeDialog> {
-
   static const _DROP_DOWN_MINUTES = ['5', '15', '30', '45'];
   static const _DROP_DOWN_HOURS = ['1', '2', '4', '6'];
 
@@ -83,7 +80,7 @@ class DateTimeDialogState extends State<DateTimeDialog> {
           secondary: Icon(Icons.alarm),
           dense: false,
           title: Text(
-              "Early reminder?",
+            "Early reminder?",
 //            style: TextStyle(fontSize: 14),
           ),
           value: earlyReminder,
@@ -94,65 +91,73 @@ class DateTimeDialogState extends State<DateTimeDialog> {
           },
         ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: DropdownButton<String>(
-                  value: _dropDownValue,
-                  disabledHint: Text("$_dropDownValue"),
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconSize: 20,
-                  elevation: 16,
-                  onChanged: !earlyReminder ? null : (String newValue) {
-                    setState(() {
-                      _dropDownValue = newValue;
-                    });
-                  },
-                  items: _dropDownValues
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text("$value", textAlign: TextAlign.center,),
-                    );
-                  }).toList(),
-                ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: DropdownButton<String>(
+                value: _dropDownValue,
+                disabledHint: Text("$_dropDownValue"),
+                icon: Icon(Icons.arrow_drop_down),
+                iconSize: 20,
+                elevation: 16,
+                onChanged: !earlyReminder
+                    ? null
+                    : (String newValue) {
+                        setState(() {
+                          _dropDownValue = newValue;
+                        });
+                      },
+                items: _dropDownValues
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      "$value",
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }).toList(),
               ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: DropdownButton<String>(
+                value: _dropDownTime,
+                disabledHint: Text("$_dropDownTime"),
+                icon: Icon(Icons.arrow_drop_down),
+                iconSize: 20,
+                elevation: 16,
+                onChanged: !earlyReminder
+                    ? null
+                    : (String newValue) {
+                        setState(() {
+                          _dropDownTime = newValue;
 
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: DropdownButton<String>(
-                  value: _dropDownTime,
-                  disabledHint: Text("$_dropDownTime"),
-                  icon: Icon(Icons.arrow_drop_down),
-                  iconSize: 20,
-                  elevation: 16,
-                  onChanged: !earlyReminder ? null : (String newValue) {
-                    setState(() {
-                      _dropDownTime = newValue;
-
-                      if (_dropDownTime == "minutes") {
-                        _dropDownValue = _DROP_DOWN_MINUTES[0];
-                        _dropDownValues = _DROP_DOWN_MINUTES;
-                      } else {
-                        _dropDownValue = _DROP_DOWN_HOURS[0];
-                        _dropDownValues = _DROP_DOWN_HOURS;
-                      }
-
-                    });
-                  },
-                  items: <String>['hours', 'minutes']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text("$value", textAlign: TextAlign.center,),
-                    );
-                  }).toList(),
-                ),
+                          if (_dropDownTime == "minutes") {
+                            _dropDownValue = _DROP_DOWN_MINUTES[0];
+                            _dropDownValues = _DROP_DOWN_MINUTES;
+                          } else {
+                            _dropDownValue = _DROP_DOWN_HOURS[0];
+                            _dropDownValues = _DROP_DOWN_HOURS;
+                          }
+                        });
+                      },
+                items: <String>['hours', 'minutes']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      "$value",
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }).toList(),
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
 
         ButtonBar(
           alignment: MainAxisAlignment.spaceBetween,
@@ -162,7 +167,6 @@ class DateTimeDialogState extends State<DateTimeDialog> {
               onPressed: () {
                 widget.task.resetEarlyReminder();
                 widget.task.resetDateTime();
-                TaskIO.writeTasks(TaskListState.tasks);
                 widget.callback();
                 Navigator.pop(context);
               },
@@ -181,16 +185,18 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                   onPressed: () {
                     // Must set early reminder BEFORE actual reminder because actual reminder method sets notification.
                     if (earlyReminder) {
-                      var duration = Duration(minutes: ((_dropDownTime == "minutes") ? 1 : 60) * int.parse(_dropDownValue));
+                      var duration = Duration(
+                          minutes: ((_dropDownTime == "minutes") ? 1 : 60) *
+                              int.parse(_dropDownValue));
                       widget.task.setEarlyReminder(duration);
                     } else {
                       widget.task.resetEarlyReminder();
                     }
                     // Combine date and time into a single DateTime instance.
                     widget.task.setDateTime(
-                        DateTime(date.year, date.month, date.day, time.hour, time.minute),
+                      DateTime(date.year, date.month, date.day, time.hour,
+                          time.minute),
                     );
-                    TaskIO.writeTasks(TaskListState.tasks);
                     widget.callback();
                     Navigator.pop(context);
                   },
@@ -211,8 +217,10 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   void initState() {
     // Check that a reminder has been set first.
     if (widget.task.isReminderSet) {
-      date = DateTime(widget.task.date.year, widget.task.date.month, widget.task.date.day);
-      time = TimeOfDay(hour: widget.task.date.hour, minute: widget.task.date.minute);
+      date = DateTime(
+          widget.task.date.year, widget.task.date.month, widget.task.date.day);
+      time = TimeOfDay(
+          hour: widget.task.date.hour, minute: widget.task.date.minute);
       if (widget.task.isEarlyReminderSet) {
         earlyReminder = true;
         var duration = widget.task.earlyReminder.inMinutes;

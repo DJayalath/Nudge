@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_nudge_reminders/notification_scheduler.dart';
 
-import 'task.dart';
-import 'task_io.dart';
 import 'task_list.dart';
+import 'task_utilities/task.dart';
+import 'task_utilities/task_manager.dart';
 
 /// A route for the user to enter and add tasks.
 class AddTask extends StatefulWidget {
@@ -20,6 +19,9 @@ class AddTask extends StatefulWidget {
 
 /// The state that allows a task to be added.
 class AddTaskState extends State<AddTask> {
+  /// An instance of the task manager.
+  TaskManager taskManager = TaskManager();
+
   /// A controller for text in the title field.
   TextEditingController titleController;
 
@@ -86,8 +88,7 @@ class AddTaskState extends State<AddTask> {
                             // The save button.
                             FlatButton(
                               child: const Text('SAVE'),
-                              onPressed: () => saveTask(Task(
-                                  titleController.text, bodyController.text)),
+                              onPressed: () => saveTask(),
                             ),
                           ],
                         ),
@@ -105,9 +106,7 @@ class AddTaskState extends State<AddTask> {
   void deleteTask() {
     if (isEditMode()) {
       // Remove from the task list.
-      NotificationScheduler.deleteNotification(TaskListState.tasks[widget.index]);
-      TaskListState.tasks.removeAt(widget.index);
-      TaskIO.writeTasks(TaskListState.tasks);
+      taskManager.removeTaskAt(widget.index);
     }
 
     // Dismiss.
@@ -144,18 +143,15 @@ class AddTaskState extends State<AddTask> {
   bool isEditMode() => widget.task != null;
 
   /// Saves the task to [TaskListState.tasks] and writes to disk.
-  void saveTask(task) {
+  void saveTask() {
     if (isEditMode()) {
-      // Edit the existing task in [TaskListState.tasks].
-      if (widget.task.isReminderSet)
-        task.setDateTime(widget.task.date);
-      TaskListState.tasks[widget.index] = task;
+      // Edit the existing task reference.
+      widget.task.title = titleController.text;
+      widget.task.body = bodyController.text;
     } else {
       // Add a new task.
-      TaskListState.tasks.add(task);
+      taskManager.createTask(titleController.text, bodyController.text);
     }
-
-    TaskIO.writeTasks(TaskListState.tasks);
 
     // Dismiss.
     widget.callback();

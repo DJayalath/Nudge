@@ -3,9 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'add_task.dart';
 import 'date_time_dialog.dart';
-import 'task.dart';
-import 'task_io.dart';
-import 'notification_scheduler.dart';
+import 'task_utilities/task_manager.dart';
 
 /// The list of tasks displayed in the home page of the app.
 class TaskList extends StatefulWidget {
@@ -15,8 +13,8 @@ class TaskList extends StatefulWidget {
 
 /// The state that shows the list of tasks.
 class TaskListState extends State<TaskList> {
-  /// The list of current tasks.
-  static List<Task> tasks = [];
+  /// The task manager.
+  TaskManager taskManager = TaskManager();
 
   /// A lighter text style for dates and times.
   final _dateTimeStyle = TextStyle(
@@ -60,15 +58,8 @@ class TaskListState extends State<TaskList> {
   void initState() {
     super.initState();
 
-    // Read tasks from disk.
-    TaskIO.readTasks().then((List<Task> taskList) {
-      setState(() {
-        tasks = taskList;
-      });
-
-      // Initialise local notifications
-      NotificationScheduler.init();
-    });
+    // Read tasks from disk by initialising taskManager.
+    taskManager.init(callback);
   }
 
   /// Builds the list of tasks to show.
@@ -77,7 +68,7 @@ class TaskListState extends State<TaskList> {
     bool notNull(Object o) => o != null;
 
     // Sort the tasks before building the task list widget.
-    tasks.sort(Task.sortTasks);
+    taskManager.sort();
 
     return Container(
       margin: EdgeInsets.all(5.0),
@@ -86,12 +77,12 @@ class TaskListState extends State<TaskList> {
       child: ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
-          itemCount: tasks.length,
+          itemCount: taskManager.length,
 
           // Create a dismissible card for each task.
           itemBuilder: (context, i) {
             return Dismissible(
-              key: Key(tasks[i].title),
+              key: Key(taskManager.getTask(i).title),
 //              movementDuration: Duration(milliseconds: 50),
               dismissThresholds: {
                 DismissDirection.startToEnd: 0.5,
@@ -115,12 +106,8 @@ class TaskListState extends State<TaskList> {
               onDismissed: (direction) {
                 // Remove from tasks
                 setState(() {
-                  NotificationScheduler.deleteNotification(tasks[i]);
-                  tasks.removeAt(i);
+                  taskManager.removeTaskAt(i);
                 });
-
-                // Write to disk.
-                TaskIO.writeTasks(tasks);
 
                 // Indicate that a task has been dismissed to the user.
                 Scaffold.of(context).showSnackBar(SnackBar(
@@ -137,7 +124,7 @@ class TaskListState extends State<TaskList> {
 
                 // This allows the card to be tapped to edit the task.
                 child: InkWell(
-                  onTap: () => _editTaskRoute(tasks[i], i),
+                  onTap: () => _editTaskRoute(taskManager.getTask(i), i),
                   child: Container(
                     margin: EdgeInsets.symmetric(vertical: 5.0),
                     child: Column(
@@ -145,40 +132,40 @@ class TaskListState extends State<TaskList> {
                         // The title and body are shown in the main ListTile.
                         ListTile(
                           title: Text(
-                            tasks[i].title,
-                            style: tasks[i].isComplete
+                            taskManager.getTask(i).title,
+                            style: taskManager.getTask(i).isComplete
                                 ? TextStyle(
                                     decoration: TextDecoration.lineThrough)
                                 : null,
                           ),
-                          subtitle:
-                              tasks[i].isBodySet() ? Text(tasks[i].body) : null,
+                          subtitle: taskManager.getTask(i).isBodySet()
+                              ? Text(taskManager.getTask(i).body)
+                              : null,
                           leading: IconButton(
                             icon: Icon(
-                                tasks[i].isComplete
+                                taskManager.getTask(i).isComplete
                                     ? Icons.check_box
                                     : Icons.check_box_outline_blank,
-                                color:
-                                    tasks[i].isComplete ? Colors.green : null),
+                                color: taskManager.getTask(i).isComplete
+                                    ? Colors.green
+                                    : null),
                             onPressed: () {
                               // Toggle completion state.
                               setState(() {
-                                tasks[i].toggleComplete();
+                                taskManager.getTask(i).toggleComplete();
                               });
-
-                              // Write to disk.
-                              TaskIO.writeTasks(tasks);
                             },
                           ),
 
                           // Allow the option to add/edit a reminder.
                           trailing: IconButton(
                             icon: Icon(
-                              tasks[i].isReminderSet
+                              taskManager.getTask(i).isReminderSet
                                   ? Icons.alarm_on
                                   : Icons.alarm_add,
-                              color:
-                                  tasks[i].isReminderSet ? Colors.green : null,
+                              color: taskManager.getTask(i).isReminderSet
+                                  ? Colors.green
+                                  : null,
                             ),
                             onPressed: () {
                               showDialog(
@@ -187,14 +174,14 @@ class TaskListState extends State<TaskList> {
                                   // Push a dialog to set a date and time for the reminder.
                                   builder: (_) {
                                     return DateTimeDialog(
-                                        tasks[i], this.callback);
+                                        taskManager.getTask(i), this.callback);
                                   });
                             },
                           ),
                         ),
 
                         // Separate main title/body from (optional) reminder information.
-                        if (tasks[i].isReminderSet)
+                        if (taskManager.getTask(i).isReminderSet)
                           Divider(
                             indent: 15.0,
                             endIndent: 15.0,
@@ -202,7 +189,7 @@ class TaskListState extends State<TaskList> {
                             color: Colors.grey[300],
                           ),
 
-                        if (tasks[i].isReminderSet)
+                        if (taskManager.getTask(i).isReminderSet)
                           // Show the user the date and time of the set reminder.
                           ListTile(
                             dense: true,
@@ -210,7 +197,8 @@ class TaskListState extends State<TaskList> {
                               padding: const EdgeInsets.all(8.0),
                               decoration: _reminderDecoration,
                               child: Text(
-                                DateFormat("HH:mm").format(tasks[i].date),
+                                DateFormat("HH:mm")
+                                    .format(taskManager.getTask(i).date),
                                 style: _dateTimeStyle,
                               ),
                             ),
@@ -218,7 +206,8 @@ class TaskListState extends State<TaskList> {
                               padding: const EdgeInsets.all(8.0),
                               decoration: _reminderDecoration,
                               child: Text(
-                                DateFormat("dd-MM-yyyy").format(tasks[i].date),
+                                DateFormat("dd-MM-yyyy")
+                                    .format(taskManager.getTask(i).date),
                                 style: _dateTimeStyle,
                               ),
                             ),
