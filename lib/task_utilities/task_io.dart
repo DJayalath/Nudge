@@ -1,26 +1,26 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'task.dart';
 
-/// A helper for reading/writing tasks to disk.
+/// A helper class for reading/writing tasks to disk.
 class TaskIO {
   /// Gets the file to which tasks will be read from or saved to.
-  static Future<File> get _localFile async {
+  Future<File> get _localFile async {
     final path = await _localPath;
     return File('$path/tasks.txt');
   }
 
   /// Gets the persistent documents directory of the device.
-  static Future<String> get _localPath async {
+  Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;
   }
 
   /// Reads tasks from disk.
-  static Future<List<Task>> readTasks() async {
+  Future<List<Task>> readTasks() async {
     final List<Task> tasks = [];
 
     try {
@@ -31,7 +31,6 @@ class TaskIO {
       final contents = await file.readAsLines();
 
       for (String line in contents) {
-
         debugPrint("Read: $line");
 
         // Split by commas (file is formatted as lines of comma-separated variables).
@@ -44,6 +43,7 @@ class TaskIO {
         if (parts[3] == "T") {
           task.setDateTime(
             DateTime.fromMillisecondsSinceEpoch(int.parse(parts[2])),
+            readMode: true,
           );
         }
 
@@ -52,7 +52,7 @@ class TaskIO {
 
         // Set early reminders
         if (parts[5] != "F") {
-          task.setEarlyReminder(Duration(minutes: int.parse(parts[5])));
+          task.setEarlyReminder(Duration(minutes: int.parse(parts[5])), readMode: true);
         }
 
         // Add the task to the working list.
@@ -60,34 +60,29 @@ class TaskIO {
       }
 
       return tasks;
-
     } catch (e) {
-
       // If no such directory/file exists, just return an empty list.
       return tasks;
     }
   }
 
   /// Writes [tasks] to disk.
-  static void writeTasks(List<Task> tasks) async {
-
+  void writeTasks(List<Task> tasks) async {
     // Get the file to write.
     final file = await _localFile;
 
     var tasksStringFormatted = "";
 
     for (Task task in tasks) {
-
       // Build string from member variables of [Task] object.
       tasksStringFormatted += "${task.title},"
           "${task.body},"
           "${task.isReminderSet ? task.date.millisecondsSinceEpoch : "F"},"
           "${task.isReminderSet ? "T" : "F"},"
           "${task.isComplete ? "T" : "F"},"
-          "${task.isEarlyReminderSet ?  task.earlyReminder.inMinutes : "F"},"
+          "${task.isEarlyReminderSet ? task.earlyReminder.inMinutes : "F"},"
           "${task.id}"
           "\n";
-
     }
 
     // Write the string to the file on disk (ensuring overwrite).
