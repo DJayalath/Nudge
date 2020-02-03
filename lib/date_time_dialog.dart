@@ -16,6 +16,10 @@ class DateTimeDialog extends StatefulWidget {
 
 /// A state to control displaying the dialog.
 class DateTimeDialogState extends State<DateTimeDialog> {
+
+  static const _DROP_DOWN_MINUTES = ['5', '15', '30', '45'];
+  static const _DROP_DOWN_HOURS = ['1', '2', '4', '6'];
+
   /// The date of the task.
   var date = DateTime.now();
 
@@ -37,8 +41,8 @@ class DateTimeDialogState extends State<DateTimeDialog> {
     fontWeight: FontWeight.w400,
   );
 
-  var _dropDownValue = '5';
-  List<String> _dropDownValues = ['5', '15', '30', '45'];
+  var _dropDownValue = _DROP_DOWN_MINUTES[0];
+  List<String> _dropDownValues = _DROP_DOWN_MINUTES;
   var _dropDownTime = 'minutes';
 
   /// Builds the dialog as a simple selection menu.
@@ -129,11 +133,11 @@ class DateTimeDialogState extends State<DateTimeDialog> {
                       _dropDownTime = newValue;
 
                       if (_dropDownTime == "minutes") {
-                        _dropDownValue = '5';
-                        _dropDownValues = ['5', '15', '30', '45'];
+                        _dropDownValue = _DROP_DOWN_MINUTES[0];
+                        _dropDownValues = _DROP_DOWN_MINUTES;
                       } else {
-                        _dropDownValue = '1';
-                        _dropDownValues = ['1', '2', '4', '6'];
+                        _dropDownValue = _DROP_DOWN_HOURS[0];
+                        _dropDownValues = _DROP_DOWN_HOURS;
                       }
 
                     });
@@ -201,6 +205,8 @@ class DateTimeDialogState extends State<DateTimeDialog> {
   }
 
   /// Sets the initial [date] and [time] to the existing values for the given task.
+  ///
+  /// This also handles early reminder state loading if it has been set for the task.
   @override
   void initState() {
     // Check that a reminder has been set first.
@@ -213,11 +219,11 @@ class DateTimeDialogState extends State<DateTimeDialog> {
         if (duration > 45) {
           _dropDownTime = "hours";
           _dropDownValue = "${duration ~/ 60}";
-          _dropDownValues = ['1', '2', '4', '6'];
+          _dropDownValues = _DROP_DOWN_HOURS;
         } else {
           _dropDownTime = "minutes";
           _dropDownValue = "$duration";
-          _dropDownValues = ['5', '15', '30', '45'];
+          _dropDownValues = _DROP_DOWN_MINUTES;
         }
       }
     }
